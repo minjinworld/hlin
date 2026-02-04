@@ -50,6 +50,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" className={hlinFont.variable}>
+      <head>
+        <title>Hlín</title>
+      </head>
       <body>
         <Header />
         {children}
