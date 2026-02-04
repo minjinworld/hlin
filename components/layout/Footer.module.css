@@ -1,0 +1,16 @@
+.footer_area {
+  padding: 30px 12px;
+  border-top: 1px solid #e3e3e3;
+}
+
+.copyright {
+  font-weight: 400;
+  font-size: 0.8rem;
+  letter-spacing: 0.6px;
+}
+
+@media (max-width: 700px) {
+  .footer_area {
+    padding: 16px 12px;
+  }
+}

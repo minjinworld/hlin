@@ -1,0 +1,39 @@
+.header_area {
+  height: 54px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 12px;
+
+  text-transform: capitalize;
+}
+
+.list_box {
+  display: flex;
+  gap: 20px;
+}
+
+.left_box {
+  display: flex;
+  gap: 90px;
+}
+
+.m_box {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .m_box {
+    display: flex;
+    gap: 12px;
+  }
+
+  .m_menu {
+    width: 16px;
+  }
+
+  .menu_box,
+  .right_box {
+    display: none;
+  }
+}
