@@ -1,5 +1,6 @@
 import Link from "next/link";
 import styles from "./Header.module.css";
+import MenuSlotText from "./MenuSlotText";
 
 export default function Header() {
   return (
@@ -31,19 +32,38 @@ export default function Header() {
         <div className={styles.menu_box}>
           <ul className={styles.list_box}>
             <li className={styles.menu}>
-              <Link href="/">shop</Link>
+              <Link href="/" className={`${styles.menuLink} ${styles.shop}`}>
+                <MenuSlotText text="shop" />
+              </Link>
             </li>
             <li className={styles.menu}>
-              <Link href="/">archives</Link>
+              <Link
+                href="/"
+                className={`${styles.menuLink} ${styles.archives}`}
+              >
+                <MenuSlotText text="archives" />
+              </Link>
             </li>
             <li className={styles.menu}>
-              <Link href="/">editorial</Link>
+              <Link
+                href="/"
+                className={`${styles.menuLink} ${styles.editorial}`}
+              >
+                <MenuSlotText text="editorial" />
+              </Link>
             </li>
             <li className={styles.menu}>
-              <Link href="/">about</Link>
+              <Link href="/" className={`${styles.menuLink} ${styles.about}`}>
+                <MenuSlotText text="about" />
+              </Link>
             </li>
             <li className={styles.menu}>
-              <Link href="/">information</Link>
+              <Link
+                href="/"
+                className={`${styles.menuLink} ${styles.information}`}
+              >
+                <MenuSlotText text="information" />
+              </Link>
             </li>
           </ul>
         </div>
@@ -51,13 +71,19 @@ export default function Header() {
       <div className={`${styles.right_box} ${styles.user_box}`}>
         <ul className={styles.list_box}>
           <li className={styles.user_list}>
-            <Link href="/">Search</Link>
+            <Link href="/" className={styles.menuLink}>
+              Search
+            </Link>
           </li>
           <li className={styles.user_list}>
-            <Link href="/">Login</Link>
+            <Link href="/" className={styles.menuLink}>
+              Login
+            </Link>
           </li>
           <li className={styles.user_list}>
-            <Link href="/">Cart</Link>
+            <Link href="/" className={styles.menuLink}>
+              Cart
+            </Link>
           </li>
         </ul>
       </div>
@@ -71,12 +97,12 @@ export default function Header() {
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <g clip-path="url(#clip0_121_296)">
+            <g clipPath="url(#clip0_121_296)">
               <path
                 d="M9.38709 4.65818C9.24249 2.47247 7.92992 1 6.02781 1C4.0812 1 2.74638 2.47247 2.6129 4.65818H1V15H11V4.65818H9.38709ZM5.99444 1.72473C7.46274 1.72473 8.40823 2.81758 8.51946 4.65818H3.4694C3.58064 2.81758 4.51502 1.72473 5.99444 1.72473ZM10.2658 14.2523H1.7119V5.40592H10.2658V14.2523Z"
                 fill="#181818"
                 stroke="#181818"
-                stroke-width="0.1"
+                strokeWidth="0.1"
               />
             </g>
             <defs>

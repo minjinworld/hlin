@@ -1,0 +1,60 @@
+.wrap {
+  display: inline-block;
+}
+
+.viewport {
+  height: 20px; /* 메뉴 라인하이트에 맞추기 */
+  overflow: hidden; /* ✅ 아래 텍스트는 항상 가려짐 */
+  display: inline-block;
+  vertical-align: bottom;
+}
+
+.stack {
+  display: block;
+  will-change: transform;
+  transition: transform 620ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.item {
+  display: block;
+  height: 20px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+/* 기본(위) */
+.plain {
+  color: #181818 !important;
+}
+
+/* ✅ hover랑 상관없이, 항상 컬러+밑줄인 상태(아래에 숨어있음) */
+.underlined {
+  color: var(--hoverColor, #3a5999);
+  box-shadow: inset 0 -1px 0 currentColor;
+}
+
+/* ✅ hover 시에는 스타일 변경 X, 오직 위치만 스왑 */
+a:hover .stack {
+  transform: translateY(-20px);
+}
+
+/* 밑줄(span처럼 동작) */
+.hover::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0px; /* 글자랑 간격 */
+  height: 2px; /* 두께 */
+  background-color: currentColor;
+}
+
+.normal {
+  color: #181818; /* 상단 고정 */
+}
+
+.hover {
+  color: var(--hoverColor, #3a5999); /* ✅ 헤더에서 내려온 값만 사용 */
+  font-weight: 400;
+  position: relative;
+}

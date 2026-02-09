@@ -179,6 +179,10 @@
     grid-template-columns: auto 1fr auto;
   }
 
+  .grid {
+    padding: 0 16px;
+  }
+
   .more {
     margin-top: 86px;
   }
@@ -190,7 +194,7 @@
   .visualMedia {
     flex-direction: column;
     margin: 86px 0 32px;
-    gap: 12px;
+    gap: 0px;
   }
 
   .visualImg {

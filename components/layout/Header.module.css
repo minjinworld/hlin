@@ -22,6 +22,43 @@
   display: none;
 }
 
+/* .shop .hover {
+  color: #3a5999;
+  font-weight: 400;
+}
+.archives .hover {
+  color: #3a5999;
+  font-weight: 400;
+}
+.editorial .hover {
+  color: #3a5999;
+  font-weight: 400;
+}
+.about .hover {
+  color: #3a5999;
+  font-weight: 400;
+}
+.information .hover {
+  color: #3a5999;
+  font-weight: 400;
+} */
+
+.shop {
+  --hoverColor: #02785a;
+}
+.archives {
+  --hoverColor: #a81701;
+}
+.editorial {
+  --hoverColor: #ffbf2a;
+}
+.about {
+  --hoverColor: #02658a;
+}
+.information {
+  --hoverColor: #56321a;
+}
+
 @media (max-width: 900px) {
   .m_box {
     display: flex;
