@@ -20,7 +20,7 @@ export default function Home() {
           /> */}
           <video
             className={styles.bannerVideo}
-            src="/videos/incar.mp4"
+            src="/videos/pallet_move_left.mp4"
             autoPlay
             muted
             loop
