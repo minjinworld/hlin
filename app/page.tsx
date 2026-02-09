@@ -9,7 +9,7 @@ export default function Home() {
       <section className={styles.banner}>
         {/* 배너 이미지(있으면) */}
         <div className={styles.bannerWrap} aria-hidden="true">
-          <Image
+          {/* <Image
             src="/images/visual/main_banner_0.jpg"
             alt=""
             width={3840}
@@ -17,6 +17,14 @@ export default function Home() {
             className={styles.bannerImg}
             unoptimized
             priority
+          /> */}
+          <video
+            className={styles.bannerVideo}
+            src="/videos/incar.mp4"
+            autoPlay
+            muted
+            loop
+            playsInline
           />
         </div>
       </section>
