@@ -55,6 +55,23 @@
   color: #1b1b1b;
 }
 
+.swatchLink {
+  display: inline-flex;
+}
+
+.swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  display: inline-block;
+}
+
+.swatchActive {
+  outline: 2px solid #181818;
+  outline-offset: 2px;
+}
+
 .price {
   font-size: 14px;
   color: #1b1b1b;

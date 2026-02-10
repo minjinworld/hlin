@@ -1,0 +1,146 @@
+.tab {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.55);
+  background: transparent;
+  border: 0;
+  padding: 10px 2px;
+  cursor: pointer;
+  position: relative;
+}
+
+.tab:hover {
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.active {
+  color: rgba(0, 0, 0, 0.95);
+}
+
+.empty {
+  margin-top: 24px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.55);
+}
+.page {
+  padding: 48px 24px 80px;
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  font-weight: 400;
+  color: #181818;
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tab {
+  border: 0;
+  background: transparent;
+  padding: 6px 0;
+  font-size: 12px;
+  color: rgba(24, 24, 24, 0.55);
+  cursor: pointer;
+}
+
+.active {
+  color: rgba(24, 24, 24, 1);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.section {
+  margin-top: 24px;
+}
+
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.sectionTitle {
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(24, 24, 24, 0.7);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* 그리드: 이미지처럼 2열(모바일) → 4열(데스크탑) */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px 18px;
+}
+
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 28px 22px;
+  }
+}
+
+.card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.media {
+  position: relative;
+  background: #f6f6f6;
+  overflow: hidden;
+}
+
+.img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* 텍스트 영역 */
+.meta {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.name {
+  font-size: 11px;
+  line-height: 1.35;
+  color: rgba(24, 24, 24, 0.78);
+}
+
+.dot {
+  margin: 0 6px;
+  color: rgba(24, 24, 24, 0.35);
+}
+
+.price {
+  font-size: 11px;
+  color: rgba(24, 24, 24, 0.55);
+}
+
+/* 호버(취향 맞게 약하게) */
+@media (hover: hover) {
+  .card:hover .img {
+    transform: scale(1.01);
+    transition: transform 180ms ease;
+  }
+}

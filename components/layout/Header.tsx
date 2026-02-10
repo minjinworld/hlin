@@ -1,130 +1,212 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import styles from "./Header.module.css";
 import MenuSlotText from "./MenuSlotText";
 
 export default function Header() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => setIsMenuOpen((v) => !v);
+  const closeMenu = () => setIsMenuOpen(false);
+
   return (
-    <div className={styles.header_area}>
-      <div className={styles.left_box}>
-        <Link href="/" className={styles.logo}>
-          <svg
-            width="68"
-            height="20"
-            viewBox="0 0 68 20"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M50.2333 20V0H55.2908L62.315 11.8881H62.3712V0H67.4287V20H62.3712L55.347 8.11189H55.2908V20H50.2333Z"
-              fill="#181818"
-            />
-            <path d="M40.1662 0H45.2237V20H40.1662V0Z" fill="#181818" />
-            <path
-              d="M22.0036 0H27.061V15.8881H35.9959V20H22.0036V0Z"
-              fill="#181818"
-            />
-            <path
-              d="M0 0H5.05746V7.83217H11.9412V0H16.9987V20H11.9412V11.9441H5.05746V20H0V0Z"
-              fill="#181818"
-            />
-          </svg>
-        </Link>
-        <div className={styles.menu_box}>
+    <>
+      <div className={styles.header_area}>
+        <div className={styles.left_box}>
+          <Link href="/" className={styles.logo} onClick={closeMenu}>
+            {/* logo svg 그대로 */}
+            <svg
+              width="68"
+              height="20"
+              viewBox="0 0 68 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M50.2333 20V0H55.2908L62.315 11.8881H62.3712V0H67.4287V20H62.3712L55.347 8.11189H55.2908V20H50.2333Z"
+                fill="#181818"
+              />
+              <path d="M40.1662 0H45.2237V20H40.1662V0Z" fill="#181818" />
+              <path
+                d="M22.0036 0H27.061V15.8881H35.9959V20H22.0036V0Z"
+                fill="#181818"
+              />
+              <path
+                d="M0 0H5.05746V7.83217H11.9412V0H16.9987V20H11.9412V11.9441H5.05746V20H0V0Z"
+                fill="#181818"
+              />
+            </svg>
+          </Link>
+
+          <div className={styles.menu_box}>
+            <ul className={styles.list_box}>
+              <li className={styles.menu}>
+                <Link
+                  href="/shop"
+                  className={`${styles.menuLink} ${styles.shop}`}
+                >
+                  <MenuSlotText text="shop" />
+                </Link>
+              </li>
+              <li className={styles.menu}>
+                <Link
+                  href="/"
+                  className={`${styles.menuLink} ${styles.archives}`}
+                >
+                  <MenuSlotText text="archives" />
+                </Link>
+              </li>
+              <li className={styles.menu}>
+                <Link
+                  href="/"
+                  className={`${styles.menuLink} ${styles.editorial}`}
+                >
+                  <MenuSlotText text="editorial" />
+                </Link>
+              </li>
+              <li className={styles.menu}>
+                <Link href="/" className={`${styles.menuLink} ${styles.about}`}>
+                  <MenuSlotText text="about" />
+                </Link>
+              </li>
+              <li className={styles.menu}>
+                <Link
+                  href="/"
+                  className={`${styles.menuLink} ${styles.information}`}
+                >
+                  <MenuSlotText text="information" />
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className={`${styles.right_box} ${styles.user_box}`}>
           <ul className={styles.list_box}>
-            <li className={styles.menu}>
-              <Link href="/" className={`${styles.menuLink} ${styles.shop}`}>
-                <MenuSlotText text="shop" />
+            <li className={styles.user_list}>
+              <Link href="/" className={styles.menuLink}>
+                Search
               </Link>
             </li>
-            <li className={styles.menu}>
-              <Link
-                href="/"
-                className={`${styles.menuLink} ${styles.archives}`}
-              >
-                <MenuSlotText text="archives" />
+            <li className={styles.user_list}>
+              <Link href="/" className={styles.menuLink}>
+                Login
               </Link>
             </li>
-            <li className={styles.menu}>
-              <Link
-                href="/"
-                className={`${styles.menuLink} ${styles.editorial}`}
-              >
-                <MenuSlotText text="editorial" />
-              </Link>
-            </li>
-            <li className={styles.menu}>
-              <Link href="/" className={`${styles.menuLink} ${styles.about}`}>
-                <MenuSlotText text="about" />
-              </Link>
-            </li>
-            <li className={styles.menu}>
-              <Link
-                href="/"
-                className={`${styles.menuLink} ${styles.information}`}
-              >
-                <MenuSlotText text="information" />
+            <li className={styles.user_list}>
+              <Link href="/" className={styles.menuLink}>
+                Cart
               </Link>
             </li>
           </ul>
         </div>
+
+        <div className={styles.m_box}>
+          <div className={styles.m_menu}>
+            {/* bag icon 그대로 */}
+            <svg
+              width="12"
+              height="16"
+              viewBox="0 0 12 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <g clipPath="url(#clip0_121_296)">
+                <path
+                  d="M9.38709 4.65818C9.24249 2.47247 7.92992 1 6.02781 1C4.0812 1 2.74638 2.47247 2.6129 4.65818H1V15H11V4.65818H9.38709ZM5.99444 1.72473C7.46274 1.72473 8.40823 2.81758 8.51946 4.65818H3.4694C3.58064 2.81758 4.51502 1.72473 5.99444 1.72473ZM10.2658 14.2523H1.7119V5.40592H10.2658V14.2523Z"
+                  fill="#181818"
+                  stroke="#181818"
+                  strokeWidth="0.1"
+                />
+              </g>
+              <defs>
+                <clipPath id="clip0_121_296">
+                  <rect width="12" height="16" fill="white" />
+                </clipPath>
+              </defs>
+            </svg>
+          </div>
+
+          {/* ✅ 여기 클릭하면 메뉴 열림/닫힘 */}
+          <button
+            type="button"
+            className={styles.m_menu_btn}
+            onClick={toggleMenu}
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMenuOpen}
+          >
+            <svg
+              width="12"
+              height="16"
+              viewBox="0 0 12 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect x="1" y="4" width="10" height="0.8" fill="#181818" />
+              <rect x="1" y="11" width="10" height="0.8" fill="#181818" />
+            </svg>
+          </button>
+        </div>
       </div>
-      <div className={`${styles.right_box} ${styles.user_box}`}>
+
+      {/* ✅ 오버레이(뒤 클릭하면 닫힘) */}
+      <div
+        className={`${styles.overlay} ${isMenuOpen ? styles.open : ""}`}
+        onClick={closeMenu}
+      />
+
+      {/* ✅ 메뉴 박스: open이면 left:0 */}
+      <div className={`${styles.m_menu_box} ${isMenuOpen ? styles.open : ""}`}>
         <ul className={styles.list_box}>
-          <li className={styles.user_list}>
-            <Link href="/" className={styles.menuLink}>
-              Search
+          <li className={styles.menu}>
+            <Link
+              href="/shop"
+              className={`${styles.menuLink} ${styles.shop}`}
+              onClick={closeMenu}
+            >
+              <MenuSlotText text="shop" />
             </Link>
           </li>
-          <li className={styles.user_list}>
-            <Link href="/" className={styles.menuLink}>
-              Login
+          <li className={styles.menu}>
+            <Link
+              href="/"
+              className={`${styles.menuLink} ${styles.archives}`}
+              onClick={closeMenu}
+            >
+              <MenuSlotText text="archives" />
             </Link>
           </li>
-          <li className={styles.user_list}>
-            <Link href="/" className={styles.menuLink}>
-              Cart
+          <li className={styles.menu}>
+            <Link
+              href="/"
+              className={`${styles.menuLink} ${styles.editorial}`}
+              onClick={closeMenu}
+            >
+              <MenuSlotText text="editorial" />
+            </Link>
+          </li>
+          <li className={styles.menu}>
+            <Link
+              href="/"
+              className={`${styles.menuLink} ${styles.about}`}
+              onClick={closeMenu}
+            >
+              <MenuSlotText text="about" />
+            </Link>
+          </li>
+          <li className={styles.menu}>
+            <Link
+              href="/"
+              className={`${styles.menuLink} ${styles.information}`}
+              onClick={closeMenu}
+            >
+              <MenuSlotText text="information" />
             </Link>
           </li>
         </ul>
       </div>
-
-      <div className={styles.m_box}>
-        <div className={styles.m_menu}>
-          <svg
-            width="12"
-            height="16"
-            viewBox="0 0 12 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <g clipPath="url(#clip0_121_296)">
-              <path
-                d="M9.38709 4.65818C9.24249 2.47247 7.92992 1 6.02781 1C4.0812 1 2.74638 2.47247 2.6129 4.65818H1V15H11V4.65818H9.38709ZM5.99444 1.72473C7.46274 1.72473 8.40823 2.81758 8.51946 4.65818H3.4694C3.58064 2.81758 4.51502 1.72473 5.99444 1.72473ZM10.2658 14.2523H1.7119V5.40592H10.2658V14.2523Z"
-                fill="#181818"
-                stroke="#181818"
-                strokeWidth="0.1"
-              />
-            </g>
-            <defs>
-              <clipPath id="clip0_121_296">
-                <rect width="12" height="16" fill="white" />
-              </clipPath>
-            </defs>
-          </svg>
-        </div>
-        <div className={styles.m_menu}>
-          <svg
-            width="12"
-            height="16"
-            viewBox="0 0 12 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect x="1" y="4" width="10" height="0.8" fill="#181818" />
-            <rect x="1" y="11" width="10" height="0.8" fill="#181818" />
-          </svg>
-        </div>
-      </div>
-    </div>
+    </>
   );
 }

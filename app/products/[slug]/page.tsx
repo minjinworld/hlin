@@ -28,6 +28,39 @@ export default async function ProductDetailPage({ params }: Props) {
 
   if (!product) return notFound();
 
+  // ✅ 1) 같은 타입(셔츠/팬츠)만 모아서 컬러칩 생성
+  const variants = PRODUCTS.filter((p) => p.name === product.name);
+
+  // color -> hex (여긴 네가 원하면 data로 옮겨도 되는데 일단 페이지에서 써도 됨)
+  const COLOR_HEX: Record<string, string> = {
+    Riesling: "#FFD2CA",
+    Water: "#9DAFD7",
+    "French Blue": "#3A5999",
+    Blueberry: "#3F475E",
+    Chestnut: "#544437",
+    Pistachio: "#C3B681",
+    Bourbon: "#464447",
+    "Dried Cherry": "#7F3337",
+  };
+
+  // ✅ 2) variants에서 컬러별로 "해당 컬러의 제품 slug" 뽑기
+  const swatches = Array.from(new Set(variants.map((v) => v.color))).map(
+    (colorName) => {
+      const target = variants.find((v) => v.color === colorName); // 같은 name 안이라 1개면 충분
+      return {
+        name: colorName,
+        hex: COLOR_HEX[colorName] ?? "#ddd",
+        slug: target?.slug ?? product.slug, // 안전장치
+      };
+    },
+  );
+
+  // ✅ 3) 현재 컬러를 맨 앞으로
+  swatches.sort((a, b) => {
+    if (a.name === product.color) return -1;
+    if (b.name === product.color) return 1;
+    return a.name.localeCompare(b.name);
+  });
   const related =
     product.relatedSlugs?.flatMap((s) => {
       const found = PRODUCTS.find((p) => p.slug === s);
@@ -61,29 +94,41 @@ export default async function ProductDetailPage({ params }: Props) {
           ) : null}
 
           <div className={styles.titleRow}>
-            <h1 className={styles.title}>{product.name}</h1>
+            <h1 className={styles.title}>
+              {product.name} - {product.color}
+            </h1>
             <p className={styles.price}>{product.price}</p>
           </div>
 
-          {/* Colors */}
-          {product.colors?.length ? (
+          {/* ✅ Colors (라인별 자동 생성 + 현재 컬러 맨앞) */}
+          {swatches.length ? (
             <div className={styles.block}>
               <div className={styles.rowBetween}>
                 <p className={styles.label}>Solid</p>
-                <p className={styles.small}>Solid - {product.colors[0].name}</p>
+                <p className={styles.small}>Solid - {product.color}</p>
               </div>
 
               <div className={styles.swatches}>
-                {product.colors.map((c) => (
-                  <button
-                    key={c.name}
-                    className={styles.swatch}
-                    type="button"
-                    aria-label={c.name}
-                    title={c.name}
-                    style={{ backgroundColor: c.hex }}
-                  />
-                ))}
+                {swatches.map((c) => {
+                  const isActive = c.name === product.color;
+                  return (
+                    <Link
+                      key={c.slug}
+                      href={`/products/${c.slug}`}
+                      className={styles.swatchLink}
+                      aria-label={c.name}
+                      title={c.name}
+                      prefetch={false}
+                    >
+                      <span
+                        className={`${styles.swatch} ${
+                          isActive ? styles.swatchActive : ""
+                        }`}
+                        style={{ backgroundColor: c.hex }}
+                      />
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           ) : null}

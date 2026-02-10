@@ -39,6 +39,12 @@ svg {
   object-fit: cover;
 }
 
+button {
+  border: none;
+  outline: none;
+  background-color: transparent;
+}
+
 @media (max-width: 700px) {
   body {
     font-size: 87.5%;

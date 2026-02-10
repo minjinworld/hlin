@@ -1,3 +1,6 @@
+"use client";
+
+import { useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import styles from "./page.module.css";
@@ -5,30 +8,50 @@ import styles from "./page.module.css";
 import { NEW_ITEMS, MORE_ITEMS } from "@/data/products";
 
 export default function Home() {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [isMuted, setIsMuted] = useState(true);
+
+  const toggleSound = async () => {
+    const v = videoRef.current;
+    if (!v) return;
+
+    // 클릭은 사용자 제스처라 소리 재생 허용됨
+    v.muted = !v.muted;
+    setIsMuted(v.muted);
+
+    // 일부 브라우저에서 muted 해제 후 play 재호출이 필요할 때가 있음
+    try {
+      await v.play();
+    } catch {
+      // 무시 (정책/상황에 따라 실패할 수 있음)
+    }
+  };
+
   return (
     <main className={styles.main}>
       {/* 1) Banner */}
       <section className={styles.banner}>
-        {/* 배너 이미지(있으면) */}
-        <div className={styles.bannerWrap} aria-hidden="true">
-          {/* <Image
-            src="/images/visual/main_banner_0.jpg"
-            alt=""
-            width={3840}
-            height={1400}
-            className={styles.bannerImg}
-            unoptimized
-            priority
-          /> */}
+        <div
+          className={styles.bannerWrap}
+          aria-hidden="true"
+          onClick={toggleSound}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") toggleSound();
+          }}
+          style={{ cursor: "pointer" }}
+        >
           <video
+            ref={videoRef}
             className={styles.bannerVideo}
-            src="/videos/pallet_move_left.mp4"
+            src="/videos/pallet_move_left_audio.mp4"
             autoPlay
-            muted
+            muted={isMuted}
             loop
             playsInline
           />
-        </div>
+        </div>{" "}
       </section>
 
       <div className={styles.container}>
