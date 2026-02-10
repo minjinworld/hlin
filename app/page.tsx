@@ -2,6 +2,8 @@ import Link from "next/link";
 import Image from "next/image";
 import styles from "./page.module.css";
 
+import { NEW_ITEMS, MORE_ITEMS } from "@/data/products";
+
 export default function Home() {
   return (
     <main className={styles.main}>
@@ -73,12 +75,10 @@ export default function Home() {
           </div>
 
           <div className={styles.grid}>
-            {/* 더미 카드 4개 (나중에 ProductCard로 교체 가능) */}
             {NEW_ITEMS.map((item) => (
               <Link
                 key={item.slug}
-                // href={`/products/${item.slug}`
-                href="#"
+                href={`/products/${item.slug}`}
                 className={styles.card}
               >
                 <div className={styles.cardMedia}>
@@ -107,12 +107,10 @@ export default function Home() {
         {/* 4) More arrivals */}
         <section className={styles.more}>
           <div className={styles.grid}>
-            {/* 더미 카드 4개 (나중에 ProductCard로 교체 가능) */}
             {MORE_ITEMS.map((item) => (
               <Link
                 key={item.slug}
-                // href={`/products/${item.slug}`
-                href="#"
+                href={`/products/${item.slug}`}
                 className={styles.card}
               >
                 <div className={styles.cardMedia}>
@@ -136,6 +134,7 @@ export default function Home() {
               </Link>
             ))}
           </div>
+
           <div className={styles.more_image}>
             <Image
               src="/images/visual/hlin_visual_image_12.PNG"
@@ -185,65 +184,3 @@ export default function Home() {
     </main>
   );
 }
-
-const NEW_ITEMS = [
-  {
-    slug: "klassisch-pyjama-french-blue",
-    name: "Klassisch sleep wear shirts",
-    color: "Water",
-    price: "₩129,000",
-    image: "/images/products/hlin_pyjama_shirts_Water.png",
-  },
-  {
-    slug: "klassisch-pyjama-baby-pink",
-    name: "Klassisch sleep wear pants",
-    color: "Water",
-    price: "₩129,000",
-    image: "/images/products/hlin_pyjama_pants_Water.png",
-  },
-  {
-    slug: "klassisch-pyjama-navy",
-    name: "Klassisch sleep wear shirts",
-    color: "Riesling",
-    price: "₩129,000",
-    image: "/images/products/hlin_pyjama_shirts_Riesling.png",
-  },
-  {
-    slug: "klassisch-pyjama-olive",
-    name: "Klassisch sleep wear pants",
-    color: "Riesling",
-    price: "₩129,000",
-    image: "/images/products/hlin_pyjama_pants_Riesling.png",
-  },
-];
-
-const MORE_ITEMS = [
-  {
-    slug: "klassisch-pyjama-french-blue",
-    name: "Klassisch sleep wear shirts",
-    color: "Blueberry",
-    price: "₩129,000",
-    image: "/images/products/hlin_pyjama_shirts_Blueberry.png",
-  },
-  {
-    slug: "klassisch-pyjama-baby-pink",
-    name: "Klassisch sleep wear pants",
-    color: "Blueberry",
-    price: "₩129,000",
-    image: "/images/products/hlin_pyjama_pants_Blueberry.png",
-  },
-  {
-    slug: "klassisch-pyjama-navy",
-    name: "Klassisch sleep wear shirts",
-    color: "Chestnut",
-    price: "₩129,000",
-    image: "/images/products/hlin_pyjama_shirts_Chestnut.png",
-  },
-  {
-    slug: "klassisch-pyjama-olive",
-    name: "Klassisch sleep wear pants",
-    color: "Chestnut",
-    price: "₩129,000",
-    image: "/images/products/hlin_pyjama_pants_Chestnut.png",
-  },
-];
