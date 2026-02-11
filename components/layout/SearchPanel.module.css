@@ -39,10 +39,14 @@
 .input {
   flex: 1;
   border: none;
-  border-bottom: 1px solid #111;
+  border-bottom: 1px solid #818181;
   font-size: 14px;
   padding: 8px 4px;
   outline: none;
+}
+
+.input::placeholder {
+  color: #c8c8c8;
 }
 
 .closeBtn {
@@ -51,6 +55,7 @@
   font-size: 22px;
   cursor: pointer;
   margin-left: 12px;
+  color: #818181;
 }
 
 .results {

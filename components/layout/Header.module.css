@@ -34,8 +34,11 @@
   height: 26px;
 }
 
-.right_box li a {
+.right_box li a,
+.right_box li button {
   display: flex;
+  width: 100%;
+  height: 100%;
 }
 
 .right_box .list_box li:last-child {

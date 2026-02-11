@@ -101,8 +101,6 @@ export default function Header() {
                 onClick={() => setIsSearchOpen(true)}
               >
                 <svg
-                  width="18"
-                  height="18"
                   viewBox="0 0 18 18"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -121,8 +119,6 @@ export default function Header() {
             <li className={styles.user_list}>
               <Link href="/" className={styles.menuLink}>
                 <svg
-                  width="18"
-                  height="18"
                   viewBox="0 0 18 18"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -172,8 +168,6 @@ export default function Header() {
                 aria-expanded={isMenuOpen}
               >
                 <svg
-                  width="18"
-                  height="18"
                   viewBox="0 0 18 18"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
