@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import styles from "./page.module.css";
+import ProductCard from "@/components/product/ProductCard";
 
 import { NEW_ITEMS, MORE_ITEMS } from "@/data/products";
 
@@ -99,30 +100,15 @@ export default function Home() {
 
           <div className={styles.grid}>
             {NEW_ITEMS.map((item) => (
-              <Link
+              <ProductCard
                 key={item.slug}
-                href={`/products/${item.slug}`}
-                className={styles.card}
-              >
-                <div className={styles.cardMedia}>
-                  <Image
-                    src={item.image}
-                    alt={item.name}
-                    width={1024}
-                    height={1536}
-                    sizes="(max-width: 900px) 50vw, 25vw"
-                    unoptimized
-                    priority
-                    className={styles.cardImg}
-                  />
-                </div>
-                <div className={styles.cardBody}>
-                  <p className={styles.cardName}>
-                    {item.name} - {item.color}
-                  </p>
-                  <p className={styles.cardMeta}>{item.price}</p>
-                </div>
-              </Link>
+                slug={item.slug}
+                name={item.name}
+                color={item.color}
+                price={item.price}
+                image={item.image}
+                priority
+              />
             ))}
           </div>
         </section>
@@ -131,30 +117,15 @@ export default function Home() {
         <section className={styles.more}>
           <div className={styles.grid}>
             {MORE_ITEMS.map((item) => (
-              <Link
+              <ProductCard
                 key={item.slug}
-                href={`/products/${item.slug}`}
-                className={styles.card}
-              >
-                <div className={styles.cardMedia}>
-                  <Image
-                    src={item.image}
-                    alt={item.name}
-                    width={1024}
-                    height={1536}
-                    sizes="(max-width: 900px) 50vw, 25vw"
-                    unoptimized
-                    priority
-                    className={styles.cardImg}
-                  />
-                </div>
-                <div className={styles.cardBody}>
-                  <p className={styles.cardName}>
-                    {item.name} - {item.color}
-                  </p>
-                  <p className={styles.cardMeta}>{item.price}</p>
-                </div>
-              </Link>
+                slug={item.slug}
+                name={item.name}
+                color={item.color}
+                price={item.price}
+                image={item.image}
+                priority
+              />
             ))}
           </div>
 

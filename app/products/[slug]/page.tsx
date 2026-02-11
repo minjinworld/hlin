@@ -2,22 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { PRODUCTS } from "@/data/products";
+import { PRODUCTS, COLOR_PALETTES } from "@/data/products";
 import styles from "./page.module.css";
-
-// Before{라우팅 안됐던 이유}:
-// type Props = { params: { slug: string } };
-// export default function ProductDetailPage({ params }: Props) {
-//   const incoming = params.slug;
-// }
-
-// Next.js(App Router + Turbopack 최신 규칙)가 이렇게 취급함:
+import CartButton from "@/components/product/CartButton";
 type Props = {
   params: Promise<{ slug: string }>;
 };
 
 export default async function ProductDetailPage({ params }: Props) {
-  // ✅ Next 최신 규칙: params는 Promise일 수 있음 → await로 풀기
   const { slug } = await params;
 
   const incoming = decodeURIComponent(slug).trim().toLowerCase();
@@ -31,36 +23,18 @@ export default async function ProductDetailPage({ params }: Props) {
   // ✅ 1) 같은 타입(셔츠/팬츠)만 모아서 컬러칩 생성
   const variants = PRODUCTS.filter((p) => p.name === product.name);
 
-  // color -> hex (여긴 네가 원하면 data로 옮겨도 되는데 일단 페이지에서 써도 됨)
-  const COLOR_HEX: Record<string, string> = {
-    Riesling: "#FFD2CA",
-    Water: "#9DAFD7",
-    "French Blue": "#3A5999",
-    Blueberry: "#3F475E",
-    Chestnut: "#544437",
-    Pistachio: "#C3B681",
-    Bourbon: "#464447",
-    "Dried Cherry": "#7F3337",
-  };
+  // ✅ 2) 데이터에 정의한 팔레트 순서대로 swatches 생성 (순서 고정)
+  const paletteKey = product.paletteKey ?? "solid";
+  const palette = COLOR_PALETTES[paletteKey] ?? COLOR_PALETTES.solid;
 
-  // ✅ 2) variants에서 컬러별로 "해당 컬러의 제품 slug" 뽑기
-  const swatches = Array.from(new Set(variants.map((v) => v.color))).map(
-    (colorName) => {
-      const target = variants.find((v) => v.color === colorName); // 같은 name 안이라 1개면 충분
-      return {
-        name: colorName,
-        hex: COLOR_HEX[colorName] ?? "#ddd",
-        slug: target?.slug ?? product.slug, // 안전장치
-      };
-    },
-  );
+  const swatches = palette
+    .map((c) => {
+      const target = variants.find((v) => v.color === c.name);
+      if (!target) return null; // 이 타입에 해당 컬러 제품이 없으면 칩 숨김
+      return { name: c.name, hex: c.hex, slug: target.slug };
+    })
+    .filter(Boolean) as { name: string; hex: string; slug: string }[];
 
-  // ✅ 3) 현재 컬러를 맨 앞으로
-  swatches.sort((a, b) => {
-    if (a.name === product.color) return -1;
-    if (b.name === product.color) return 1;
-    return a.name.localeCompare(b.name);
-  });
   const related =
     product.relatedSlugs?.flatMap((s) => {
       const found = PRODUCTS.find((p) => p.slug === s);
@@ -92,15 +66,17 @@ export default async function ProductDetailPage({ params }: Props) {
           {product.category ? (
             <p className={styles.kicker}>{product.category}</p>
           ) : null}
-
           <div className={styles.titleRow}>
             <h1 className={styles.title}>
               {product.name} - {product.color}
             </h1>
-            <p className={styles.price}>{product.price}</p>
-          </div>
 
-          {/* ✅ Colors (라인별 자동 생성 + 현재 컬러 맨앞) */}
+            <p className={styles.price}>
+              <span className={styles.krw}>₩</span>
+              {product.price}
+            </p>
+          </div>
+          {/* ✅ Colors (팔레트 순서 고정 + active는 테두리만) */}
           {swatches.length ? (
             <div className={styles.block}>
               <div className={styles.rowBetween}>
@@ -121,9 +97,7 @@ export default async function ProductDetailPage({ params }: Props) {
                       prefetch={false}
                     >
                       <span
-                        className={`${styles.swatch} ${
-                          isActive ? styles.swatchActive : ""
-                        }`}
+                        className={`${styles.swatch} ${isActive ? styles.swatchActive : ""}`}
                         style={{ backgroundColor: c.hex }}
                       />
                     </Link>
@@ -132,7 +106,6 @@ export default async function ProductDetailPage({ params }: Props) {
               </div>
             </div>
           ) : null}
-
           {/* Sizes */}
           {product.sizes?.length ? (
             <div className={styles.block}>
@@ -157,12 +130,11 @@ export default async function ProductDetailPage({ params }: Props) {
               </button>
             </div>
           ) : null}
-
           {/* CTA */}
-          <button className={styles.cta} type="button">
-            Add to cart
-          </button>
-
+          <CartButton
+            slug={product.slug}
+            inStock={product.inStock ?? false}
+          />{" "}
           {/* Accordions */}
           <div className={styles.accordions}>
             <button className={styles.accordion} type="button">
@@ -178,7 +150,6 @@ export default async function ProductDetailPage({ params }: Props) {
               <span>+</span>
             </button>
           </div>
-
           {/* Related */}
           {related.length ? (
             <div className={styles.related}>
@@ -208,6 +179,7 @@ export default async function ProductDetailPage({ params }: Props) {
           ) : null}
         </aside>
       </div>
+
       {/* DETAIL IMAGES (FULL ONLY) */}
       {product.detailImages?.length ? (
         <section className={styles.detail}>

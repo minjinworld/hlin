@@ -1,0 +1,95 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.3s;
+  z-index: 90;
+}
+
+.overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.panel {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 60%;
+  height: 100vh;
+  background: white;
+  transition: 0.35s ease;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel.open {
+  right: 0;
+}
+
+.header {
+  display: flex;
+  padding: 100px 20px 20px 20px;
+  /* border-bottom: 1px solid #eee; */
+}
+
+.input {
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid #111;
+  font-size: 14px;
+  padding: 8px 4px;
+  outline: none;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  margin-left: 12px;
+}
+
+.results {
+  padding: 20px;
+  overflow-y: auto;
+  display: grid;
+  gap: 16px;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.thumb img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.name {
+  font-size: 13px;
+}
+
+.price {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.empty {
+  font-size: 13px;
+  opacity: 0.6;
+}
+
+@media (max-width: 900px) {
+  .panel {
+    width: 100%;
+  }
+}

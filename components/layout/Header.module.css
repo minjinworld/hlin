@@ -28,30 +28,23 @@
   gap: 90px;
 }
 
-.m_box {
+.right_box li {
+  display: flex;
+  width: 22px;
+  height: 22px;
+}
+
+.right_box li a {
+  display: flex;
+}
+
+.right_box .list_box li:last-child {
   display: none;
 }
 
-/* .shop .hover {
-  color: #3a5999;
-  font-weight: 400;
+.m_box {
+  display: none;
 }
-.archives .hover {
-  color: #3a5999;
-  font-weight: 400;
-}
-.editorial .hover {
-  color: #3a5999;
-  font-weight: 400;
-}
-.about .hover {
-  color: #3a5999;
-  font-weight: 400;
-}
-.information .hover {
-  color: #3a5999;
-  font-weight: 400;
-} */
 
 .shop {
   --hoverColor: #02785a;
@@ -69,24 +62,36 @@
   --hoverColor: #56321a;
 }
 
+/* 장바구니 뱃지 */
+.cartWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.cartBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+
+  width: 16px;
+  height: 16px;
+
+  background: #5d5d5d;
+  color: white;
+  font-size: 10px;
+  border-radius: 999px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 @media (max-width: 900px) {
-  .m_box {
+  .right_box .list_box li:last-child {
     display: flex;
-    gap: 12px;
   }
-
-  .m_menu {
-    width: 16px;
-  }
-
-  .menu_box,
-  .right_box {
+  .menu_box {
     display: none;
-  }
-
-  .m_menu_btn {
-    width: 16px;
-    cursor: pointer;
   }
 
   .m_menu_box {

@@ -1,0 +1,38 @@
+.krw {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+/* Product (카드들이 배치되는 영역 - grid 는 전역 css에) */
+.card {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cardMedia {
+  aspect-ratio: 3 / 4;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cardMeta {
+  opacity: 0.5;
+}
+
+/* Responsive - 카드 관련 */
+@media (max-width: 1320px) {
+  .cardBody {
+    padding: 0px 4px;
+  }
+}
+
+@media (max-width: 900px) {
+  .cardBody {
+    padding: 0px 8px;
+  }
+}

@@ -21,8 +21,9 @@
   font-size: 13px;
   color: rgba(0, 0, 0, 0.55);
 }
+
 .page {
-  padding: 48px 24px 80px;
+  padding: 68px 16px 80px;
   max-width: 1320px;
   margin: 0 auto;
 }
@@ -31,11 +32,11 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  margin-bottom: 32px;
+  margin-bottom: 12px;
 }
 
 .title {
-  font-size: 14px;
+  font-size: 16px;
   letter-spacing: 0.02em;
   font-weight: 400;
   color: #181818;
@@ -45,6 +46,7 @@
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  margin-bottom: 32px;
 }
 
 .tab {
@@ -84,14 +86,14 @@
 /* 그리드: 이미지처럼 2열(모바일) → 4열(데스크탑) */
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 22px 18px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
 }
 
-@media (min-width: 900px) {
+@media (max-width: 900px) {
   .grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 28px 22px;
+    grid-template-columns: repeat(2, 1fr);
+    /* gap: 16px; */
   }
 }
 
@@ -135,12 +137,4 @@
 .price {
   font-size: 11px;
   color: rgba(24, 24, 24, 0.55);
-}
-
-/* 호버(취향 맞게 약하게) */
-@media (hover: hover) {
-  .card:hover .img {
-    transform: scale(1.01);
-    transition: transform 180ms ease;
-  }
 }

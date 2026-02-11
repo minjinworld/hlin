@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { CartProvider } from "@/context/CartContext";
 
 const hlinFont = localFont({
   src: [
@@ -54,9 +55,11 @@ export default function RootLayout({
         <title>Hlín</title>
       </head>
       <body>
-        <Header />
-        {children}
-        <Footer />
+        <CartProvider>
+          <Header />
+          {children}
+          <Footer />
+        </CartProvider>{" "}
       </body>
     </html>
   );
