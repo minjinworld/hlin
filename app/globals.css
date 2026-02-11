@@ -45,6 +45,7 @@ button {
   border: none;
   outline: none;
   background-color: transparent;
+  color: #181818;
 }
 
 @media (max-width: 700px) {
