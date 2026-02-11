@@ -30,8 +30,8 @@
 
 .right_box li {
   display: flex;
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
 }
 
 .right_box li a {
@@ -73,8 +73,8 @@
   top: -4px;
   right: -4px;
 
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
 
   background: #5d5d5d;
   color: white;
@@ -106,6 +106,7 @@
     background-color: #f6f6f6;
 
     transition: 0.3s;
+    font-size: 24px;
   }
 
   /* ✅ open되면 left:0 */

@@ -58,3 +58,16 @@ a:hover .stack {
   font-weight: 400;
   position: relative;
 }
+@media (max-width: 900px) {
+  a:hover .stack {
+    transform: none;
+  }
+
+  .viewport {
+    overflow: visible;
+  }
+
+  .hover {
+    display: none;
+  }
+}
