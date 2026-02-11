@@ -8,3 +8,48 @@
   font-size: 16px;
   letter-spacing: 0.7px;
 }
+.wrap {
+  display: grid;
+  gap: 10px;
+}
+
+.sizeBlock {
+  display: grid;
+  gap: 8px;
+}
+
+.sizeLabel {
+  font-size: 12px;
+  color: #6a6a6a;
+}
+
+.sizeBtns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sizeBtn {
+  height: 34px;
+  padding: 0 12px;
+  background: #e1e1e1;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.sizeBtnActive {
+  background: #646464;
+  color: #fff;
+}
+
+.cta {
+  height: 44px;
+  border: 1px solid #1b1b1b;
+  background: #3f3f3f;
+  color: #fff;
+  cursor: pointer;
+}
+
+.soldout {
+  opacity: 0.6;
+}

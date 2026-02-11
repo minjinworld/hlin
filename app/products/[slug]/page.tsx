@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { PRODUCTS, COLOR_PALETTES } from "@/data/products";
 import styles from "./page.module.css";
 import CartButton from "@/components/product/CartButton";
+
 type Props = {
   params: Promise<{ slug: string }>;
 };
@@ -30,7 +31,7 @@ export default async function ProductDetailPage({ params }: Props) {
   const swatches = palette
     .map((c) => {
       const target = variants.find((v) => v.color === c.name);
-      if (!target) return null; // 이 타입에 해당 컬러 제품이 없으면 칩 숨김
+      if (!target) return null;
       return { name: c.name, hex: c.hex, slug: target.slug };
     })
     .filter(Boolean) as { name: string; hex: string; slug: string }[];
@@ -40,6 +41,9 @@ export default async function ProductDetailPage({ params }: Props) {
       const found = PRODUCTS.find((p) => p.slug === s);
       return found ? [found] : [];
     }) ?? [];
+
+  // ✅ 사이즈 라벨만 뽑아서 CartButton에 전달
+  const sizeOptions = product.sizes?.map((s) => s.label) ?? [];
 
   return (
     <main className={styles.page}>
@@ -66,6 +70,7 @@ export default async function ProductDetailPage({ params }: Props) {
           {product.category ? (
             <p className={styles.kicker}>: {product.category}</p>
           ) : null}
+
           <div className={styles.titleRow}>
             <h1 className={styles.title}>
               {product.name} - {product.color}
@@ -76,7 +81,8 @@ export default async function ProductDetailPage({ params }: Props) {
               {product.price}
             </p>
           </div>
-          {/* ✅ Colors (팔레트 순서 고정 + active는 테두리만) */}
+
+          {/* Colors */}
           {swatches.length ? (
             <div className={styles.block}>
               <div className={styles.rowBetween}>
@@ -97,7 +103,9 @@ export default async function ProductDetailPage({ params }: Props) {
                       prefetch={false}
                     >
                       <span
-                        className={`${styles.swatch} ${isActive ? styles.swatchActive : ""}`}
+                        className={`${styles.swatch} ${
+                          isActive ? styles.swatchActive : ""
+                        }`}
                         style={{ backgroundColor: c.hex }}
                       />
                     </Link>
@@ -106,14 +114,12 @@ export default async function ProductDetailPage({ params }: Props) {
               </div>
             </div>
           ) : null}
-          {/* Sizes */}
+
+          {/* ✅ Sizes (표시는 그대로 두고) */}
           {product.sizes?.length ? (
             <div className={styles.block}>
               <div className={styles.rowBetween}>
                 <p className={styles.label}>Size guide (cm):</p>
-                {/* <button type="button" className={styles.linkBtn}>
-                  Size guide
-                </button> */}
               </div>
 
               <div className={styles.sizes}>
@@ -126,11 +132,14 @@ export default async function ProductDetailPage({ params }: Props) {
               </div>
             </div>
           ) : null}
-          {/* CTA */}
+
+          {/* ✅ CTA: sizeOptions 전달 + 선택한 size로 장바구니 담김 */}
           <CartButton
             slug={product.slug}
             inStock={product.inStock ?? false}
-          />{" "}
+            sizeOptions={sizeOptions}
+          />
+
           {/* Related */}
           {related.length ? (
             <div className={styles.related}>
@@ -152,7 +161,9 @@ export default async function ProductDetailPage({ params }: Props) {
                         className={styles.relatedImg}
                       />
                     </div>
-                    <p className={styles.relatedName}>{rp.name}</p>
+                    <p className={styles.relatedName}>
+                      {rp.name} - {rp.color}
+                    </p>
                   </Link>
                 ))}
               </div>
