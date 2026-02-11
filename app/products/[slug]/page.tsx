@@ -64,7 +64,7 @@ export default async function ProductDetailPage({ params }: Props) {
         {/* RIGHT: product info */}
         <aside className={styles.info}>
           {product.category ? (
-            <p className={styles.kicker}>{product.category}</p>
+            <p className={styles.kicker}>: {product.category}</p>
           ) : null}
           <div className={styles.titleRow}>
             <h1 className={styles.title}>
@@ -110,10 +110,10 @@ export default async function ProductDetailPage({ params }: Props) {
           {product.sizes?.length ? (
             <div className={styles.block}>
               <div className={styles.rowBetween}>
-                <p className={styles.label}>Recommended sizes (cm):</p>
-                <button type="button" className={styles.linkBtn}>
+                <p className={styles.label}>Size guide (cm):</p>
+                {/* <button type="button" className={styles.linkBtn}>
                   Size guide
-                </button>
+                </button> */}
               </div>
 
               <div className={styles.sizes}>
@@ -124,10 +124,6 @@ export default async function ProductDetailPage({ params }: Props) {
                   </div>
                 ))}
               </div>
-
-              <button type="button" className={styles.linkBtnLeft}>
-                View all sizes
-              </button>
             </div>
           ) : null}
           {/* CTA */}
@@ -135,21 +131,6 @@ export default async function ProductDetailPage({ params }: Props) {
             slug={product.slug}
             inStock={product.inStock ?? false}
           />{" "}
-          {/* Accordions */}
-          <div className={styles.accordions}>
-            <button className={styles.accordion} type="button">
-              <span>Details</span>
-              <span>+</span>
-            </button>
-            <button className={styles.accordion} type="button">
-              <span>Care</span>
-              <span>+</span>
-            </button>
-            <button className={styles.accordion} type="button">
-              <span>Quality and impact</span>
-              <span>+</span>
-            </button>
-          </div>
           {/* Related */}
           {related.length ? (
             <div className={styles.related}>

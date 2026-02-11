@@ -72,8 +72,8 @@ const DEFAULT_DESCRIPTION =
   "Made from 100% washed cotton, with a crisp and refreshing feel.";
 
 const DEFAULT_SIZES: ProductSize[] = [
-  { label: "M", note: "Size details will be updated soon" },
-  { label: "L", note: "Size details will be updated soon" },
+  { label: "M", note: "Size details will be updated soon." },
+  { label: "L", note: "Size details will be updated soon." },
 ];
 
 /* =========================

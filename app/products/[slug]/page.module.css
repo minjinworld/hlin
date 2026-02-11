@@ -29,7 +29,7 @@
 }
 
 .desc {
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.5;
   color: #6a6a6a;
 }
@@ -43,8 +43,13 @@
 }
 
 .kicker {
-  font-size: 12px;
   color: #6a6a6a;
+  font-weight: 400;
+  /* text-decoration: underline; */
+  border-top: 0.5px solid #b4b4b4;
+
+  border-bottom: 0.5px solid #b4b4b4;
+  padding: 12px 0;
 }
 
 .titleRow {
@@ -57,7 +62,8 @@
 .title {
   font-size: 20px;
   font-weight: 500;
-  color: #1b1b1b;
+  color: #464646;
+  letter-spacing: 0.7px;
 }
 
 .swatchLink {
@@ -85,8 +91,9 @@
 }
 
 .price {
-  font-size: 14px;
   color: #1b1b1b;
+  font-size: 16px;
+  font-weight: 100;
 }
 
 .block {
@@ -102,12 +109,12 @@
 }
 
 .label {
-  font-size: 12px;
   color: #6a6a6a;
+  font-weight: 400;
+  letter-spacing: 0.6px;
 }
 
 .small {
-  font-size: 12px;
   color: #6a6a6a;
 }
 
@@ -132,12 +139,11 @@
 }
 
 .sizeLabel {
-  font-size: 12px;
-  color: #1b1b1b;
+  color: #6a6a6a;
+  font-weight: 400;
 }
 
 .sizeNote {
-  font-size: 12px;
   color: #6a6a6a;
 }
 
@@ -147,7 +153,7 @@
   background: transparent;
   padding: 0;
   cursor: pointer;
-  font-size: 12px;
+
   color: #6a6a6a;
   text-decoration: underline;
 }
@@ -172,7 +178,7 @@
   display: flex;
   justify-content: space-between;
   cursor: pointer;
-  font-size: 12px;
+
   color: #1b1b1b;
 }
 
@@ -181,9 +187,10 @@
 }
 
 .relatedTitle {
-  font-size: 12px;
-  color: #6a6a6a;
+  color: #1b1b1b;
   margin-bottom: 10px;
+  font-weight: 400;
+  letter-spacing: 0.6px;
 }
 
 .relatedGrid {
@@ -249,10 +256,19 @@
     grid-template-columns: 1fr;
     gap: 24px;
   }
+
   .info {
     position: static;
   }
+
   .relatedGrid {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .swatch:hover,
+  .swatchActive {
+    outline: 1px solid #8d8d8d;
+    outline-offset: 1px;
+    transform: translateY(0);
   }
 }

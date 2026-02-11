@@ -120,7 +120,7 @@ export default function CartPage() {
           onClick={() => alert("Checkout은 아직 준비중이에요 :)")}
           disabled={!lines.length}
         >
-          Checkout
+          Check out
         </button>
 
         <div className={styles.total}>
