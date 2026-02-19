@@ -18,7 +18,12 @@ a {
 
 html,
 body {
-  overflow-x: hidden;
+  width: 100%;
+  overflow-x: clip; /* hidden보다 레이아웃 부작용이 적은 편 */
+}
+
+html {
+  scrollbar-gutter: stable; /* 스크롤바 자리 고정 (지원 브라우저에서) */
 }
 
 body {
