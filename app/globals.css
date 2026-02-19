@@ -24,6 +24,8 @@ body {
 
 html {
   scrollbar-gutter: stable; /* 스크롤바 자리 고정 (지원 브라우저에서) */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {

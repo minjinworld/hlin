@@ -1,9 +1,21 @@
+// app/layout.tsx
 import "./globals.css";
 import localFont from "next/font/local";
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { CartProvider } from "@/context/CartContext";
+
+// ✅ 1) iOS/모바일에서 레이아웃 폭/세이프에어리어 안정화
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
+export const metadata = {
+  title: "Hlín",
+};
 
 const hlinFont = localFont({
   src: [
@@ -51,15 +63,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" className={hlinFont.variable}>
-      <head>
-        <title>Hlín</title>
-      </head>
       <body>
         <CartProvider>
           <Header />
           {children}
           <Footer />
-        </CartProvider>{" "}
+        </CartProvider>
       </body>
     </html>
   );
