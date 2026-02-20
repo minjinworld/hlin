@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export async function GET() {
-  const cookieStore = await cookies();
+  const cookieStore = await cookies(); // ✅ 여기 포인트
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -24,15 +24,20 @@ export async function GET() {
     },
   );
 
-  const { data: auth } = await supabase.auth.getUser();
-  if (!auth.user) {
+  const { data: auth, error: authErr } = await supabase.auth.getUser();
+  if (authErr || !auth.user) {
     return NextResponse.json({ orders: [] }, { status: 401 });
   }
 
-  // ✅ 임시: 전체 주문 (다음 단계에서 auth.user.email로 필터링)
+  const email = auth.user.email ?? null;
+  if (!email) {
+    return NextResponse.json({ orders: [] }, { status: 200 });
+  }
+
   const { data, error } = await supabaseAdmin
     .from("orders")
     .select("*")
+    .eq("buyer_email", email)
     .order("created_at", { ascending: false });
 
   if (error) {
