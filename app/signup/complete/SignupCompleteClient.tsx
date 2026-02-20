@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { createSupabaseBrowserClient } from "@/lib/supabaseClient";
 
-export {}; // ✅ 이거 유지 (전역 선언 인식 안정화)
+export {}; // ✅ 유지 (전역 선언 인식 안정화)
 
 type Props = {
   next: string;
@@ -44,7 +44,7 @@ function isRecord(v: unknown): v is Record<string, unknown> {
 }
 
 function getDaumPostcodeCtor(): DaumPostcodeConstructor | null {
-  const daum = window.daum;
+  const daum = (window as unknown as { daum?: unknown }).daum;
   if (!isRecord(daum)) return null;
 
   const Postcode = daum["Postcode"];
@@ -123,6 +123,18 @@ export default function SignupCompleteClient({ next }: Props) {
 
     const init = async () => {
       setLoading(true);
+      setPhoneError(null);
+      setAddrError(null);
+
+      // ✅ 핵심: supabase가 null이면 더 진행하지 않기
+      if (!supabase) {
+        if (!alive) return;
+        setLoading(false);
+        setAddrError(
+          "Supabase 초기화에 실패했어요. 환경변수(.env.local) 설정을 확인해줘.",
+        );
+        return;
+      }
 
       const { data } = await supabase.auth.getSession();
       const u = data.session?.user ?? null;
@@ -164,7 +176,7 @@ export default function SignupCompleteClient({ next }: Props) {
       setLoading(false);
     };
 
-    init();
+    void init();
 
     return () => {
       alive = false;
@@ -219,6 +231,13 @@ export default function SignupCompleteClient({ next }: Props) {
   };
 
   const onSave = async () => {
+    // ✅ supabase/user 둘 다 가드
+    if (!supabase) {
+      setAddrError(
+        "Supabase 초기화에 실패했어요. 환경변수(.env.local) 설정을 확인해줘.",
+      );
+      return;
+    }
     if (!user) return;
     if (!validate()) return;
 
@@ -246,6 +265,8 @@ export default function SignupCompleteClient({ next }: Props) {
       setSaving(false);
     }
   };
+
+  const canInteract = !loading && !!supabase;
 
   return (
     <main
@@ -288,6 +309,7 @@ export default function SignupCompleteClient({ next }: Props) {
                 placeholder="연락처"
                 type="tel"
                 autoComplete="tel"
+                disabled={!canInteract}
                 style={{
                   width: "100%",
                   padding: "12px 14px",
@@ -297,6 +319,7 @@ export default function SignupCompleteClient({ next }: Props) {
                     : "1px solid #e5e7eb",
                   outline: "none",
                   fontSize: 14,
+                  background: !canInteract ? "#fafafa" : "white",
                 }}
               />
               {phoneError && (
@@ -318,15 +341,17 @@ export default function SignupCompleteClient({ next }: Props) {
                 <button
                   type="button"
                   onClick={openPostcode}
+                  disabled={!canInteract}
                   style={{
                     padding: "8px 10px",
                     borderRadius: 10,
                     border: "1px solid #e5e7eb",
                     background: "white",
                     fontWeight: 900,
-                    cursor: "pointer",
+                    cursor: canInteract ? "pointer" : "not-allowed",
                     fontSize: 12,
                     whiteSpace: "nowrap",
+                    opacity: canInteract ? 1 : 0.6,
                   }}
                 >
                   우편번호 찾기
@@ -371,6 +396,7 @@ export default function SignupCompleteClient({ next }: Props) {
                   value={address2}
                   onChange={(e) => setAddress2(e.target.value)}
                   placeholder="상세주소 (동/호수 등)"
+                  disabled={!canInteract}
                   style={{
                     width: "100%",
                     padding: "12px 14px",
@@ -378,6 +404,7 @@ export default function SignupCompleteClient({ next }: Props) {
                     border: "1px solid #e5e7eb",
                     outline: "none",
                     fontSize: 14,
+                    background: !canInteract ? "#fafafa" : "white",
                   }}
                 />
                 {addrError && (
@@ -391,7 +418,7 @@ export default function SignupCompleteClient({ next }: Props) {
             <button
               type="button"
               onClick={onSave}
-              disabled={saving}
+              disabled={saving || !canInteract}
               style={{
                 marginTop: 6,
                 padding: "12px 14px",
@@ -400,8 +427,8 @@ export default function SignupCompleteClient({ next }: Props) {
                 background: "#111",
                 color: "#fff",
                 fontWeight: 900,
-                cursor: "pointer",
-                opacity: saving ? 0.7 : 1,
+                cursor: saving || !canInteract ? "not-allowed" : "pointer",
+                opacity: saving || !canInteract ? 0.7 : 1,
               }}
             >
               {saving ? "저장 중..." : "저장하고 계속"}

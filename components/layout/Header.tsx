@@ -25,6 +25,13 @@ export default function Header() {
   useEffect(() => {
     let alive = true;
 
+    // ✅ supabase가 null이면 auth 호출/구독 자체를 안 함
+    if (!supabase) {
+      return () => {
+        alive = false;
+      };
+    }
+
     const init = async () => {
       const { data, error } = await supabase.auth.getUser();
       if (!alive) return;
@@ -37,16 +44,16 @@ export default function Header() {
       setUser(data.user ?? null);
     };
 
-    init();
+    void init();
 
-    const sub = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!alive) return;
       setUser(session?.user ?? null);
     });
 
     return () => {
       alive = false;
-      sub.data.subscription.unsubscribe();
+      sub.subscription.unsubscribe();
     };
   }, [supabase]);
 
@@ -156,6 +163,7 @@ export default function Header() {
                   href="/mypage"
                   className={`${styles.menuLink} ${styles.mypage}`}
                 >
+                  {/* ... (svg 동일) */}
                   <svg
                     width="17"
                     height="17"
@@ -195,6 +203,7 @@ export default function Header() {
                   className={styles.menuLink}
                   aria-label="Login"
                 >
+                  {/* ... (svg 동일) */}
                   <svg
                     viewBox="0 0 18 18"
                     fill="none"

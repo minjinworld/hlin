@@ -19,17 +19,21 @@ export default function AdminLayout({
     let alive = true;
 
     const run = async () => {
+      // ✅ 핵심: supabase가 없으면(=서버/예외상황 방어) 그냥 종료
+      if (!supabase) {
+        if (alive) setLoading(false);
+        return;
+      }
+
       try {
         const { data } = await supabase.auth.getSession();
         const user = data.session?.user;
 
-        // 1) 로그인 안했으면 로그인으로
         if (!user) {
           router.replace("/login");
           return;
         }
 
-        // 2) profiles.is_admin 확인
         const { data: profile, error } = await supabase
           .from("profiles")
           .select("is_admin")

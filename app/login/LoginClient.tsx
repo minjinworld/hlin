@@ -82,7 +82,20 @@ export default function LoginClient({ next }: Props) {
     }).open();
   };
 
+  // ✅ supabase 가져오는 헬퍼 (null 처리 포함)
+  const getSupabase = () => {
+    const sb = createSupabaseBrowserClient();
+    if (!sb) {
+      alert("브라우저에서만 사용할 수 있어요. 새로고침 해주세요.");
+      return null;
+    }
+    return sb;
+  };
+
   const signInOAuth = async (provider: "google" | "kakao") => {
+    const supabase = getSupabase();
+    if (!supabase) return;
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
@@ -97,6 +110,9 @@ export default function LoginClient({ next }: Props) {
   };
 
   const signInPassword = async () => {
+    const supabase = getSupabase();
+    if (!supabase) return;
+
     setLoading(true);
     try {
       const { error } = await supabase.auth.signInWithPassword({
@@ -121,6 +137,8 @@ export default function LoginClient({ next }: Props) {
   };
 
   const signUpPassword = async () => {
+    setLoading(true);
+    if (!supabase) return;
     setLoading(true);
 
     try {

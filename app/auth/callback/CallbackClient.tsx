@@ -87,6 +87,8 @@ export default function CallbackClient() {
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
 
+    if (!supabase) return;
+
     const run = async () => {
       const error = sp.get("error_description") || sp.get("error");
       if (error) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -52,8 +52,6 @@ function formatPhoneKR(input: string) {
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
-
   const { items, count } = useCart();
 
   const lines: Line[] = items.flatMap((it) => {
@@ -95,31 +93,36 @@ export default function CheckoutPage() {
   // ✅ “주문자 정보와 동일”
   const [sameAsBuyer, setSameAsBuyer] = useState(false);
 
+  // ✅ derived: 선택된 주소 (useEffect들보다 먼저!)
+  const selectedAddress =
+    addresses.find((a) => a.id === selectedAddressId) ?? null;
+
+  // ✅ 주문자 정보 동일 체크 시 자동 복사
   useEffect(() => {
     if (!sameAsBuyer) return;
 
     if (isGuest) {
-      // 비회원: 배송지 입력폼의 받는분/연락처 → 주문자 정보로 복사
       setBuyerName(guestRecipient);
       setBuyerPhone(guestPhone);
-    } else {
-      // 회원: 선택된 배송지의 받는분/연락처 → 주문자 정보로 복사
-      if (selectedAddress) {
-        setBuyerName(selectedAddress.recipient_name ?? "");
-        setBuyerPhone(
-          selectedAddress.phone ? formatPhoneKR(selectedAddress.phone) : "",
-        );
-      }
+      return;
+    }
+
+    if (selectedAddress) {
+      setBuyerName(selectedAddress.recipient_name ?? "");
+      setBuyerPhone(
+        selectedAddress.phone ? formatPhoneKR(selectedAddress.phone) : "",
+      );
     }
   }, [
     sameAsBuyer,
     isGuest,
     guestRecipient,
     guestPhone,
-    selectedAddressId, // 선택 주소 바뀔 때도 반영
-    // selectedAddress는 derived라 selectedAddressId를 넣는 게 안정적
+    selectedAddressId,
+    selectedAddress,
   ]);
 
+  // ✅ 초기 로딩: 회원이면 addresses 불러오고, 아니면 게스트로
   useEffect(() => {
     let alive = true;
 
@@ -131,9 +134,22 @@ export default function CheckoutPage() {
       }
 
       setAddrLoading(true);
+
+      const sb = createSupabaseBrowserClient();
+
+      // ✅ 빌드/서버 상황: supabase 생성 불가면 게스트로
+      if (sb == null) {
+        if (!alive) return;
+        setIsGuest(true);
+        setAddresses([]);
+        setSelectedAddressId("");
+        setAddrLoading(false);
+        return;
+      }
+
       try {
-        const { data: session } = await supabase.auth.getSession();
-        const user = session.session?.user;
+        const { data: sessionRes } = await sb.auth.getSession();
+        const user = sessionRes.session?.user;
 
         // ✅ 비회원 허용
         if (!user) {
@@ -141,12 +157,11 @@ export default function CheckoutPage() {
           setIsGuest(true);
           setAddresses([]);
           setSelectedAddressId("");
-          setAddrLoading(false);
           return;
         }
 
         // ✅ 회원이면 addresses 로딩
-        const { data, error } = await supabase
+        const { data, error } = await sb
           .from("addresses")
           .select(
             "id,user_id,label,recipient_name,phone,postcode,address,address2,is_default,created_at",
@@ -164,13 +179,14 @@ export default function CheckoutPage() {
         const rows = Array.isArray(data) ? (data as AddressRow[]) : [];
         if (!alive) return;
 
+        setIsGuest(false);
         setAddresses(rows);
 
         const defaultAddr = rows.find((a) => a.is_default) ?? rows[0];
         if (defaultAddr) {
           setSelectedAddressId(defaultAddr.id);
 
-          // 주문자정보 기본값 세팅(원하면 유지)
+          // 주문자정보 기본값 세팅
           setBuyerName(defaultAddr.recipient_name ?? "");
           setBuyerPhone(
             defaultAddr.phone ? formatPhoneKR(defaultAddr.phone) : "",
@@ -187,11 +203,7 @@ export default function CheckoutPage() {
     return () => {
       alive = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [supabase]);
-
-  const selectedAddress =
-    addresses.find((a) => a.id === selectedAddressId) ?? null;
+  }, [router, lines.length]);
 
   const isGuestShippingValid =
     guestRecipient.trim() &&
@@ -269,10 +281,7 @@ export default function CheckoutPage() {
       }
 
       alert(`저장 완료! 주문ID: ${json?.id ?? "-"}`);
-
-      // ✅ 여기부터 실제 결제 연결(토스페이먼츠/아임포트 등) 붙이면 됨
       alert("결제 준비중입니다.");
-      // router.push(`/order/complete?id=${json?.id}`)
     } finally {
       setPlacing(false);
     }
@@ -295,7 +304,6 @@ export default function CheckoutPage() {
             <div className={styles.cardHead}>
               <h2 className={styles.h2}>배송지</h2>
 
-              {/* ✅ 회원만 “배송지 관리” 노출 */}
               {!isGuest ? (
                 <Link href="/mypage" className={styles.link}>
                   배송지 관리 →
@@ -305,7 +313,6 @@ export default function CheckoutPage() {
               )}
             </div>
 
-            {/* ✅ 여기! 게스트면 입력 폼 / 회원이면 기존 라디오 리스트 */}
             {isGuest ? (
               <div className={styles.form}>
                 <label className={styles.field}>
@@ -356,6 +363,16 @@ export default function CheckoutPage() {
                     value={guestAddress2}
                     onChange={(e) => setGuestAddress2(e.target.value)}
                     placeholder="동/호수 등"
+                  />
+                </label>
+
+                <label className={styles.field}>
+                  <span>이메일(선택)</span>
+                  <input
+                    value={guestEmail}
+                    onChange={(e) => setGuestEmail(e.target.value)}
+                    placeholder="receipt@email.com"
+                    inputMode="email"
                   />
                 </label>
               </div>
@@ -421,6 +438,7 @@ export default function CheckoutPage() {
               />
               주문자 정보 동일
             </label>
+
             <h2 className={styles.h2}>주문자 정보</h2>
 
             <div className={styles.form}>
@@ -526,7 +544,6 @@ export default function CheckoutPage() {
               {placing ? "처리 중…" : "결제하기"}
             </button>
 
-            {/* ✅ 경고문도 게스트/회원 분리 */}
             {isGuest ? (
               !isGuestShippingValid ? (
                 <div className={styles.warn}>

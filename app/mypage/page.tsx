@@ -1,14 +1,14 @@
 // app/mypage/page.tsx
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { createSupabaseBrowserClient } from "@/lib/supabaseClient";
 
 /**
  * ✅ 전제
- * - profiles: id(uuid=auth.user.id), email, full_name, phone, postcode, address, address2
+ * - profiles: id(uuid=auth.user.id), email, full_name, phone, postcode, address, address2, is_admin
  * - addresses: id(uuid), user_id(uuid), label, recipient_name, phone, postcode, address, address2, is_default, created_at
  */
 
@@ -92,6 +92,7 @@ function parseProfileRow(v: unknown): ProfileRow | null {
   if (!isRecord(v)) return null;
   const id = toStr(v.id);
   if (!id) return null;
+
   return {
     id,
     email: toStr(v.email),
@@ -100,7 +101,7 @@ function parseProfileRow(v: unknown): ProfileRow | null {
     postcode: toStr(v.postcode),
     address: toStr(v.address),
     address2: toStr(v.address2),
-    is_admin: toBool(v.is_admin), // ✅ 추가
+    is_admin: toBool(v.is_admin),
   };
 }
 
@@ -136,8 +137,14 @@ function formatAddress(a: {
 }
 
 export default function MyPage() {
-  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const router = useRouter();
+
+  // ✅ 여기서 supabase를 고정(useMemo)하지 말고,
+  //    필요할 때마다 만들고 null이면 early return
+  const getSupabase = () => {
+    const sb = createSupabaseBrowserClient();
+    return sb ?? null;
+  };
 
   const [user, setUser] = useState<User | null>(null);
 
@@ -169,6 +176,9 @@ export default function MyPage() {
      🔥 프로필 주소 → 배송지 자동 생성(딱 1회)
   -------------------------------- */
   const migrateProfileAddressToAddresses = async (userId: string) => {
+    const supabase = getSupabase();
+    if (!supabase) return;
+
     // 1) profiles에서 주소 읽기
     const { data: p, error: pErr } = await supabase
       .from("profiles")
@@ -213,79 +223,92 @@ export default function MyPage() {
   };
 
   /* -------------------------------
+     🔄 로더들
+  -------------------------------- */
+  const loadProfile = async (userId: string) => {
+    const supabase = getSupabase();
+    if (!supabase) return;
+
+    setProfileLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id,email,full_name,phone,postcode,address,address2,is_admin")
+        .eq("id", userId)
+        .maybeSingle();
+
+      if (error) {
+        console.warn("profile load error:", error);
+        setProfile(null);
+        return;
+      }
+
+      const parsed = parseProfileRow(data as unknown);
+      setProfile(parsed);
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
+  const loadOrders = async () => {
+    setOrdersLoading(true);
+    try {
+      const res = await fetch("/api/orders/me", { cache: "no-store" });
+      if (res.ok) {
+        const json = (await res.json()) as { orders: Order[] };
+        setOrders(json.orders ?? []);
+      } else {
+        setOrders([]);
+      }
+    } catch {
+      setOrders([]);
+    } finally {
+      setOrdersLoading(false);
+    }
+  };
+
+  const loadAddresses = async (userId: string) => {
+    const supabase = getSupabase();
+    if (!supabase) return;
+
+    setAddrLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("addresses")
+        .select(
+          "id,user_id,label,recipient_name,phone,postcode,address,address2,is_default,created_at",
+        )
+        .eq("user_id", userId)
+        .order("is_default", { ascending: false })
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.warn("addresses load error:", error);
+        setAddresses([]);
+        return;
+      }
+
+      const rows = Array.isArray(data) ? data : [];
+      const parsed = rows
+        .map((r) => parseAddressRow(r as unknown))
+        .filter((x): x is AddressRow => x !== null);
+
+      setAddresses(parsed);
+    } finally {
+      setAddrLoading(false);
+    }
+  };
+
+  /* -------------------------------
      🔄 초기 로딩
   -------------------------------- */
   useEffect(() => {
     let alive = true;
 
-    const loadProfile = async (userId: string) => {
-      setProfileLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("id,email,full_name,phone,postcode,address,address2,is_admin") // ✅
-          .eq("id", userId)
-          .maybeSingle();
-        if (error) {
-          console.warn("profile load error:", error);
-          if (alive) setProfile(null);
-          return;
-        }
-
-        const parsed = parseProfileRow(data as unknown);
-        if (alive) setProfile(parsed);
-      } finally {
-        if (alive) setProfileLoading(false);
-      }
-    };
-
-    const loadOrders = async () => {
-      setOrdersLoading(true);
-      try {
-        const res = await fetch("/api/orders/me", { cache: "no-store" });
-        if (res.ok) {
-          const json = (await res.json()) as { orders: Order[] };
-          if (alive) setOrders(json.orders ?? []);
-        } else {
-          if (alive) setOrders([]);
-        }
-      } catch {
-        if (alive) setOrders([]);
-      } finally {
-        if (alive) setOrdersLoading(false);
-      }
-    };
-
-    const loadAddresses = async (userId: string) => {
-      setAddrLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from("addresses")
-          .select(
-            "id,user_id,label,recipient_name,phone,postcode,address,address2,is_default,created_at",
-          )
-          .eq("user_id", userId)
-          .order("is_default", { ascending: false })
-          .order("created_at", { ascending: false });
-
-        if (error) {
-          console.warn("addresses load error:", error);
-          if (alive) setAddresses([]);
-          return;
-        }
-
-        const rows = Array.isArray(data) ? data : [];
-        const parsed = rows
-          .map((r) => parseAddressRow(r as unknown))
-          .filter((x): x is AddressRow => x !== null);
-
-        if (alive) setAddresses(parsed);
-      } finally {
-        if (alive) setAddrLoading(false);
-      }
-    };
-
     const init = async () => {
+      const supabase = getSupabase();
+      if (!supabase) return;
+
       const { data } = await supabase.auth.getSession();
       const u = data.session?.user ?? null;
 
@@ -307,13 +330,16 @@ export default function MyPage() {
       void loadAddresses(u.id);
     };
 
-    init();
+    void init();
     return () => {
       alive = false;
     };
-  }, [router, supabase]);
+  }, [router]); // ✅ supabase 제거 (getSupabase는 내부 함수라 deps 불필요)
 
   const handleLogout = async () => {
+    const supabase = getSupabase();
+    if (!supabase) return;
+
     await supabase.auth.signOut();
     router.replace("/");
     router.refresh();
@@ -324,6 +350,9 @@ export default function MyPage() {
       "정말 탈퇴할까요?\n탈퇴하면 계정과 회원정보가 삭제되고 복구할 수 없습니다.",
     );
     if (!ok) return;
+
+    const supabase = getSupabase();
+    if (!supabase) return;
 
     try {
       const { data } = await supabase.auth.getSession();
@@ -403,36 +432,15 @@ export default function MyPage() {
 
   const reloadAddresses = async () => {
     if (!user) return;
-    setAddrLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from("addresses")
-        .select(
-          "id,user_id,label,recipient_name,phone,postcode,address,address2,is_default,created_at",
-        )
-        .eq("user_id", user.id)
-        .order("is_default", { ascending: false })
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.warn("addresses reload error:", error);
-        setAddresses([]);
-        return;
-      }
-
-      const rows = Array.isArray(data) ? data : [];
-      setAddresses(
-        rows
-          .map((r) => parseAddressRow(r as unknown))
-          .filter((x): x is AddressRow => x !== null),
-      );
-    } finally {
-      setAddrLoading(false);
-    }
+    await loadAddresses(user.id);
   };
 
   const saveAddress = async () => {
     if (!user) return;
+
+    const supabase = getSupabase();
+    if (!supabase) return;
+
     setAddrError(null);
 
     const errMsg = validateAddressDraft(addrDraft);
@@ -505,6 +513,10 @@ export default function MyPage() {
 
   const deleteAddress = async (id: string) => {
     if (!user) return;
+
+    const supabase = getSupabase();
+    if (!supabase) return;
+
     const ok = confirm("이 배송지를 삭제할까요?");
     if (!ok) return;
 
@@ -574,6 +586,7 @@ export default function MyPage() {
           <button type="button" onClick={handleDeleteAccount} style={btnDanger}>
             회원탈퇴
           </button>
+
           {/* ✅ 관리자만 보이는 버튼 */}
           {profile?.is_admin ? (
             <button
@@ -612,7 +625,7 @@ export default function MyPage() {
               <div style={{ fontSize: 13, opacity: 0.7 }}>
                 {profile?.phone
                   ? formatPhoneKR(profile.phone)
-                  : "연락처 미등록"}{" "}
+                  : "연락처 미등록"}
               </div>
             </div>
 
@@ -640,7 +653,7 @@ export default function MyPage() {
                   <span style={{ opacity: 0.6, fontWeight: 800 }}>
                     {primaryAddress.phone
                       ? `· ${formatPhoneKR(primaryAddress.phone)}`
-                      : ""}{" "}
+                      : ""}
                   </span>
                 </div>
                 <div style={{ fontSize: 13, opacity: 0.8 }}>
@@ -684,7 +697,7 @@ export default function MyPage() {
               <Row
                 label="연락처"
                 value={profile?.phone ? formatPhoneKR(profile.phone) : "—"}
-              />{" "}
+              />
               <Row
                 label="주소"
                 value={
@@ -698,14 +711,6 @@ export default function MyPage() {
                 }
                 subtle
               />
-              <div
-                style={{
-                  marginTop: 4,
-                  fontSize: 12,
-                  opacity: 0.6,
-                  lineHeight: 1.5,
-                }}
-              ></div>
             </div>
           )}
         </article>
@@ -871,7 +876,7 @@ export default function MyPage() {
                         onChange={(v) =>
                           setAddrDraft((p) => ({ ...p, phone: v }))
                         }
-                      />{" "}
+                      />
                     </div>
 
                     <div
@@ -1151,6 +1156,7 @@ function Field({
     </label>
   );
 }
+
 /* styles */
 
 const cardStyle: React.CSSProperties = {
