@@ -126,7 +126,16 @@ export default async function ProductDetailPage({ params }: Props) {
                 {product.sizes.map((s) => (
                   <div key={s.label} className={styles.sizeRow}>
                     <span className={styles.sizeLabel}>{s.label}</span>
-                    <span className={styles.sizeNote}>{s.note ?? ""}</span>
+                    <span
+                      className={styles.sizeNote}
+                      style={{
+                        whiteSpace: "pre-line",
+                        fontSize: "12px",
+                        fontWeight: 400,
+                      }}
+                    >
+                      {s.note ?? ""}
+                    </span>
                   </div>
                 ))}
               </div>

@@ -72,10 +72,17 @@ const DEFAULT_DESCRIPTION =
   "Made from 100% washed cotton, with a crisp and refreshing feel.";
 
 const DEFAULT_SIZES: ProductSize[] = [
-  { label: "M", note: "Size details will be updated soon." },
-  { label: "L", note: "Size details will be updated soon." },
+  {
+    label: "M",
+    note: `[TOP] 총장 66cm 어깨 47cm 가슴 56cm 소매길이 59cm
+[BOTTOM] 총장 96cm 허리 50cm 밑위 26cm 허벅지 32cm`,
+  },
+  {
+    label: "L",
+    note: `[TOP] 총장 68cm 어깨 50cm 가슴 60cm 소매길이 65cm
+[BOTTOM] 총장 100cm 허리 60cm 밑위 28cm 허벅지 36cm`,
+  },
 ];
-
 /* =========================
  * COLOR HEX MAP
  * ========================= */

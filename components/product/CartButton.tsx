@@ -37,7 +37,7 @@ export default function CartButton({ slug, inStock, sizeOptions = [] }: Props) {
     }
 
     addItem(slug, 1, selectedSize);
-    alert("장바구니에 담겼어요!");
+    alert("장바구니에 담겼어요.");
   };
 
   return (

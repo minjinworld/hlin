@@ -4,7 +4,7 @@ import localFont from "next/font/local";
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import InAppBrowserBanner from "@/components/layout/InAppBrowserHandler";
+import InAppBrowserHandler from "@/components/layout/InAppBrowserHandler";
 import { CartProvider } from "@/context/CartContext";
 
 // ✅ 1) iOS/모바일에서 레이아웃 폭/세이프에어리어 안정화
@@ -66,7 +66,7 @@ export default function RootLayout({
     <html lang="ko" className={hlinFont.variable}>
       <body>
         <CartProvider>
-          <InAppBrowserBanner />
+          <InAppBrowserHandler />
           <Header />
           {children}
           <Footer />

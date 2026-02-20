@@ -5,6 +5,7 @@ import Link from "next/link";
 import { PRODUCTS, type Product } from "@/data/products";
 import { useCart, type CartItem } from "@/context/CartContext";
 import styles from "./page.module.css";
+import { useRouter } from "next/navigation";
 
 const formatKRW = (n: number) => new Intl.NumberFormat("ko-KR").format(n);
 
@@ -29,6 +30,8 @@ export default function CartPage() {
   const total = lines.reduce((sum, l) => {
     return sum + priceToNumber(l.product.price) * l.item.qty;
   }, 0);
+
+  const router = useRouter();
 
   return (
     <main className={styles.page}>
@@ -117,7 +120,7 @@ export default function CartPage() {
         <button
           type="button"
           className={styles.checkoutBtn}
-          onClick={() => alert("Checkout은 아직 준비중이에요 :)")}
+          onClick={() => router.push("/checkout")}
           disabled={!lines.length}
         >
           Check out
