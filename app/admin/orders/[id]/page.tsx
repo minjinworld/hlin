@@ -47,7 +47,6 @@ type OrderRow = {
 
 type OrdersSuccess = { orders: OrderRow[] };
 type OrdersError = { error: string; detail?: string };
-type OrdersResponse = OrdersSuccess | OrdersError;
 
 function isOrdersSuccess(data: unknown): data is OrdersSuccess {
   return (
@@ -74,7 +73,8 @@ function formatKST(iso: string): string {
 }
 
 function sumItems(items: OrderItem[]) {
-  const qty = items.reduce((s, it) => s + Number(it.qty || 0), 0);
+  const qty = items.reduce((s, it) => s + Number(it.qty ?? 0), 0);
+
   const names = items.map((it) => it.name).filter(Boolean);
 
   const title =
@@ -88,17 +88,13 @@ function sumItems(items: OrderItem[]) {
 }
 
 export default function AdminOrdersPage() {
-  const [pw, setPw] = useState<string>("");
+  const [pw, setPw] = useState("");
   const [orders, setOrders] = useState<OrderRow[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
 
-  const [q, setQ] = useState<string>("");
-  const [onlyUnshipped, setOnlyUnshipped] = useState<boolean>(true);
+  const [q, setQ] = useState("");
+  const [onlyUnshipped, setOnlyUnshipped] = useState(true);
   const [payFilter, setPayFilter] = useState<PaymentStatus | "ALL">("ALL");
-
-  const [edit, setEdit] = useState<
-    Record<string, { carrier: string; tracking: string }>
-  >({});
 
   async function load(): Promise<void> {
     if (!pw.trim()) {
@@ -142,7 +138,6 @@ export default function AdminOrdersPage() {
 
     return orders.filter((o) => {
       if (onlyUnshipped && o.fulfillment_status === "SHIPPED") return false;
-
       if (payFilter !== "ALL" && o.payment_status !== payFilter) return false;
 
       if (!keyword) return true;
@@ -183,13 +178,20 @@ export default function AdminOrdersPage() {
               <div>
                 <Link href={`/admin/orders/${o.id}`}>{o.order_no ?? o.id}</Link>
               </div>
+
               <div>
                 {o.buyer_name} · {o.buyer_phone}
               </div>
+
               <div>
                 상품: {title} · {qty}개
               </div>
+
               <div>₩{Number(o.amount).toLocaleString()}</div>
+
+              <div style={{ fontSize: 12, opacity: 0.6 }}>
+                {formatKST(o.created_at)}
+              </div>
             </li>
           );
         })}
