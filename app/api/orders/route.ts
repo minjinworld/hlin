@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 
 type CartItem = {
   productId: string;
@@ -25,7 +25,7 @@ function generateOrderNo() {
 }
 
 export async function POST(req: Request) {
-  const body = await req.json();
+  const body = await req.json().catch(() => ({}));
 
   const {
     buyerName,
@@ -49,6 +49,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "INVALID_REQUEST" }, { status: 400 });
   }
 
+  // ✅ 여기서 생성 (import 시점 X)
+  const supabase = createSupabaseAdminClient();
+
   const orderId = `ord_${crypto.randomUUID()}`;
   const amount = calcAmount(items);
 
@@ -56,7 +59,7 @@ export async function POST(req: Request) {
   for (let i = 0; i < 5; i++) {
     const orderNo = generateOrderNo();
 
-    const { error } = await supabaseAdmin.from("orders").insert({
+    const { error } = await supabase.from("orders").insert({
       id: orderId,
       order_no: orderNo,
       buyer_name: buyerName,

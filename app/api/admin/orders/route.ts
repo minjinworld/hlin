@@ -1,18 +1,20 @@
+// app/api/admin/orders/route.ts
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 import { isAdmin } from "@/lib/adminAuth";
 
 export async function GET(req: Request) {
   if (!isAdmin(req)) {
     return NextResponse.json(
-      {
-        error: "비밀번호가 다릅니다.",
-      },
+      { error: "비밀번호가 다릅니다." },
       { status: 401 },
     );
   }
 
-  const { data, error } = await supabaseAdmin
+  // ✅ 함수 호출해서 클라이언트 생성
+  const supabase = createSupabaseAdminClient();
+
+  const { data, error } = await supabase
     .from("orders")
     .select("*")
     .order("created_at", { ascending: false })

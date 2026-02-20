@@ -1,9 +1,28 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 
 function digitsOnly(v: string) {
   return (v ?? "").replaceAll(/[^0-9]/g, "");
 }
+
+type OrderLookupRow = {
+  id: string;
+  order_no: string;
+  created_at: string;
+  amount: number;
+  currency: string;
+  payment_status: string;
+  fulfillment_status: string;
+  shipping_carrier: string | null;
+  tracking_number: string | null;
+  items: unknown; // items 컬럼이 jsonb면 unknown이 안전 (원하면 더 구체화 가능)
+  shipping_zip: string;
+  shipping_addr1: string;
+  shipping_addr2: string | null;
+  buyer_phone: string;
+};
+
+type SafeOrderLookupRow = Omit<OrderLookupRow, "buyer_phone">;
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
@@ -16,13 +35,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "INVALID_REQUEST" }, { status: 400 });
   }
 
-  const { data, error } = await supabaseAdmin
+  // ✅ 여기서 생성 (import 시점 X)
+  const supabase = createSupabaseAdminClient();
+
+  const { data, error } = await supabase
     .from("orders")
     .select(
       "id, order_no, created_at, amount, currency, payment_status, fulfillment_status, shipping_carrier, tracking_number, items, shipping_zip, shipping_addr1, shipping_addr2, buyer_phone",
     )
     .eq("order_no", no)
-    .maybeSingle();
+    .maybeSingle<OrderLookupRow>();
 
   if (error) {
     return NextResponse.json(
@@ -39,8 +61,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "NOT_MATCH" }, { status: 401 });
   }
 
-  // ✅ 고객에게는 buyer_phone 같은 개인정보는 내려주지 말자
-  const { buyer_phone, ...safe } = data;
+  // ✅ buyer_phone 제거 (any 없이)
+  const { buyer_phone: _buyerPhone, ...safe } = data;
 
-  return NextResponse.json({ ok: true, order: safe });
+  return NextResponse.json({
+    ok: true,
+    order: safe satisfies SafeOrderLookupRow,
+  });
 }
