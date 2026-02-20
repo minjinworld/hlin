@@ -1,48 +1,46 @@
-// app/api/orders/me/route.ts
+// app/api/admin/orders/[id]/route.ts
 import { NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 
-export async function GET() {
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options);
-          });
-        },
-      },
-    },
-  );
+type Ctx = { params: Promise<{ id: string }> };
 
-  const { data: auth, error: authErr } = await supabase.auth.getUser();
-  if (authErr || !auth.user) {
-    return NextResponse.json({ orders: [] }, { status: 401 });
-  }
+export async function GET(_req: Request, ctx: Ctx) {
+  const { id } = await ctx.params;
 
-  const email = auth.user.email ?? null;
-  if (!email) {
-    return NextResponse.json({ orders: [] }, { status: 200 });
-  }
+  // ✅ 여기서 생성 (import 시점 X)
+  const supabase = createSupabaseAdminClient();
 
-  // ✅ "내 주문만" (buyer_email 기준)
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await supabase
     .from("orders")
     .select("*")
-    .eq("buyer_email", email)
-    .order("created_at", { ascending: false });
+    .eq("id", id)
+    .maybeSingle();
 
   if (error) {
-    return NextResponse.json({ orders: [] }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+  if (!data) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  return NextResponse.json({ orders: data ?? [] });
+  return NextResponse.json(data);
+}
+
+export async function PATCH(req: Request, ctx: Ctx) {
+  const { id } = await ctx.params;
+  const body = await req.json().catch(() => ({}));
+
+  const supabase = createSupabaseAdminClient();
+
+  const { data, error } = await supabase
+    .from("orders")
+    .update(body)
+    .eq("id", id)
+    .select("*")
+    .maybeSingle();
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+  return NextResponse.json(data);
 }
