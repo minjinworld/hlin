@@ -2,14 +2,17 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 export function createSupabaseAdminClient(): SupabaseClient {
-  const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  // server에서 쓸 URL: SUPABASE_URL 없으면 NEXT_PUBLIC도 fallback
+  const url =
+    process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+
+  // server에서 쓸 key: service role
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
 
   if (!url) throw new Error("SUPABASE_URL is required.");
-  if (!serviceRoleKey)
-    throw new Error("SUPABASE_SERVICE_ROLE_KEY is required.");
+  if (!serviceKey) throw new Error("SUPABASE_SERVICE_ROLE_KEY is required.");
 
-  return createClient(url, serviceRoleKey, {
+  return createClient(url, serviceKey, {
     auth: {
       persistSession: false,
       autoRefreshToken: false,

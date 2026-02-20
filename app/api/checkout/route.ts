@@ -1,27 +1,34 @@
 // app/api/checkout/route.ts
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createSupabaseAdminClient } from "@/lib/supabaseAdmin";
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
+const digitsOnly = (s: string) => String(s ?? "").replace(/\D/g, "");
 
-const digitsOnly = (s: string) => s.replace(/\D/g, "");
+type CheckoutBody = {
+  buyer?: { name?: string; phone?: string; email?: string | null };
+  shipping?: {
+    recipient_name?: string;
+    recipient_phone?: string;
+    postcode?: string;
+    address?: string;
+    address2?: string | null;
+  };
+  memo?: string | null;
+  items?: unknown[];
+  amount?: number;
+  currency?: string;
+  isGuest?: boolean;
+};
 
 export async function POST(req: Request) {
-  try {
-    const body = await req.json();
+  // ✅ 여기서 생성 (import 시점 X)
+  const supabase = createSupabaseAdminClient();
 
-    const {
-      buyer, // { name, phone, email? }
-      shipping, // { recipient_name, recipient_phone, postcode, address, address2? }
-      memo,
-      items,
-      amount,
-      currency,
-      isGuest,
-    } = body ?? {};
+  try {
+    const body = (await req.json().catch(() => ({}))) as CheckoutBody;
+
+    const { buyer, shipping, memo, items, amount, currency, isGuest } =
+      body ?? {};
 
     if (!Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
@@ -64,7 +71,7 @@ export async function POST(req: Request) {
 
           memo: memo ?? null,
           items,
-          amount: Number.isFinite(amount) ? amount : 0,
+          amount: Number.isFinite(amount) ? Number(amount) : 0,
           currency: currency ?? "KRW",
           status: "draft",
         })
