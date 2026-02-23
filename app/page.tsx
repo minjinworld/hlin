@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import styles from "./page.module.css";
@@ -10,22 +10,36 @@ import { NEW_ITEMS, MORE_ITEMS } from "@/data/products";
 
 export default function Home() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [isMuted, setIsMuted] = useState(true);
 
+  // ✅ 모바일 autoplay 안정화
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+
+    v.muted = true;
+
+    const tryPlay = async () => {
+      try {
+        await v.play();
+      } catch {
+        // 정책/상황에 따라 실패할 수 있음(무시)
+      }
+    };
+
+    v.addEventListener("loadeddata", tryPlay);
+    return () => v.removeEventListener("loadeddata", tryPlay);
+  }, []);
+
+  // ✅ 사용자 클릭 시 소리 토글
   const toggleSound = async () => {
     const v = videoRef.current;
     if (!v) return;
 
-    // 클릭은 사용자 제스처라 소리 재생 허용됨
     v.muted = !v.muted;
-    setIsMuted(v.muted);
 
-    // 일부 브라우저에서 muted 해제 후 play 재호출이 필요할 때가 있음
     try {
       await v.play();
-    } catch {
-      // 무시 (정책/상황에 따라 실패할 수 있음)
-    }
+    } catch {}
   };
 
   return (
@@ -48,11 +62,12 @@ export default function Home() {
             className={styles.bannerVideo}
             src="/videos/pallet_move_left_audio.mp4"
             autoPlay
-            muted={isMuted}
+            muted
             loop
             playsInline
+            preload="auto"
           />
-        </div>{" "}
+        </div>
       </section>
 
       <div className={styles.container}>
@@ -142,7 +157,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 4) Visual image */}
+        {/* 5) Visual image */}
         <section className={styles.visual}>
           <div className={styles.visualMedia}>
             <Image
