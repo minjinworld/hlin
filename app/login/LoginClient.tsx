@@ -27,10 +27,21 @@ export default function LoginClient({ next }: Props) {
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const router = useRouter();
 
-  const redirectTo =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`
-      : undefined;
+  // ✅ FIX: 모바일 사파리에서 origin 흔들림/허용 URL 불일치 방지
+  // - NEXT_PUBLIC_SITE_URL을 우선 사용 (배포 도메인 고정)
+  // - 비어있으면 현재 origin으로 fallback
+  // - https 보장
+  const rawOrigin = typeof window !== "undefined" ? window.location.origin : "";
+
+  const SITE_URL = (
+    process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+    rawOrigin ||
+    ""
+  ).replace(/^http:\/\//, "https://");
+
+  const redirectTo = SITE_URL
+    ? `${SITE_URL}/auth/callback?next=${encodeURIComponent(next)}`
+    : undefined;
 
   // ✅ auth fields
   const [email, setEmail] = useState("");
@@ -82,6 +93,7 @@ export default function LoginClient({ next }: Props) {
     }).open();
   };
 
+  // ✅ supabase 가져오는 헬퍼 (null 처리 포함)
   const getSupabase = () => {
     const sb = createSupabaseBrowserClient();
     if (!sb) {
@@ -94,6 +106,14 @@ export default function LoginClient({ next }: Props) {
   const signInOAuth = async (provider: "google" | "kakao") => {
     const supabase = getSupabase();
     if (!supabase) return;
+
+    // ✅ FIX: redirectTo가 비어있으면 바로 안내 (모바일에서 특히 중요)
+    if (!redirectTo) {
+      alert(
+        "로그인 리다이렉트 URL이 비어있어요. NEXT_PUBLIC_SITE_URL 설정을 확인해 주세요.",
+      );
+      return;
+    }
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
@@ -219,7 +239,6 @@ export default function LoginClient({ next }: Props) {
       />
 
       <div style={wrap}>
-        {/* ✅ 카드 박스 제거: 컨테이너만 */}
         <div style={container}>
           <div style={header}>
             <h2 style={title}>{mode === "signin" ? "Sign in" : "Sign up"}</h2>
@@ -402,13 +421,13 @@ export default function LoginClient({ next }: Props) {
   );
 }
 
-/* ✅ UI 톤: 카드 제거 + 흘린 느낌(공기/여백/얇은 라인) */
+/* styles */
 const wrap: React.CSSProperties = {
   minHeight: "100dvh",
   display: "grid",
   placeItems: "center",
   padding: 24,
-  background: "#f7f6f4", // 살짝 웜한 오프화이트
+  background: "#f7f6f4",
 };
 
 const container: React.CSSProperties = {
