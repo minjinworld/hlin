@@ -51,6 +51,16 @@ type OrdersResponse =
   | { orders: OrderRow[] }
   | { error: string; detail?: string };
 
+async function safeJson<T>(res: Response): Promise<T | null> {
+  const text = await res.text();
+  if (!text) return null;
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    return null;
+  }
+}
+
 function formatKST(iso: string) {
   try {
     return new Intl.DateTimeFormat("ko-KR", {
@@ -147,12 +157,18 @@ export default function AdminOrdersClient() {
         cache: "no-store",
       });
 
-      const data = (await res.json()) as OrdersResponse;
+      const data =
+        (await safeJson<OrdersResponse>(res)) ??
+        ({
+          error: "Invalid response",
+          detail: `Empty/Non-JSON response (status: ${res.status})`,
+        } as const);
+
       if (!res.ok) {
         const msg =
           "error" in data
             ? `${data.error}\n${data.detail ?? ""}`
-            : "불러오기 실패";
+            : `불러오기 실패 (status: ${res.status})`;
         throw new Error(msg);
       }
 
@@ -216,11 +232,15 @@ export default function AdminOrdersClient() {
       }),
     });
 
-    const data = (await res.json()) as {
-      ok?: boolean;
-      error?: string;
-      detail?: string;
-    };
+    const data =
+      (await safeJson<{ ok?: boolean; error?: string; detail?: string }>(
+        res,
+      )) ??
+      ({
+        error: "Invalid response",
+        detail: `Empty/Non-JSON response (status: ${res.status})`,
+      } as const);
+
     if (!res.ok) {
       alert(`${data.error ?? "업데이트 실패"}\n${data.detail ?? ""}`);
       return;
@@ -262,11 +282,15 @@ export default function AdminOrdersClient() {
       }),
     });
 
-    const data = (await res.json()) as {
-      ok?: boolean;
-      error?: string;
-      detail?: string;
-    };
+    const data =
+      (await safeJson<{ ok?: boolean; error?: string; detail?: string }>(
+        res,
+      )) ??
+      ({
+        error: "Invalid response",
+        detail: `Empty/Non-JSON response (status: ${res.status})`,
+      } as const);
+
     if (!res.ok) {
       alert(`${data.error ?? "출고 처리 실패"}\n${data.detail ?? ""}`);
       return;
@@ -295,11 +319,15 @@ export default function AdminOrdersClient() {
       }),
     });
 
-    const data = (await res.json()) as {
-      ok?: boolean;
-      error?: string;
-      detail?: string;
-    };
+    const data =
+      (await safeJson<{ ok?: boolean; error?: string; detail?: string }>(
+        res,
+      )) ??
+      ({
+        error: "Invalid response",
+        detail: `Empty/Non-JSON response (status: ${res.status})`,
+      } as const);
+
     if (!res.ok) {
       alert(`${data.error ?? "취소 실패"}\n${data.detail ?? ""}`);
       return;
