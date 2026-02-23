@@ -58,6 +58,7 @@
 @media (max-width: 700px) {
   .footer {
     padding: 0;
+    margin-top: 0;
   }
   .brand {
     padding: 16px;
