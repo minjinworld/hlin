@@ -7,8 +7,8 @@ import { createSupabaseBrowserClient } from "@/lib/supabaseClient";
 
 /** ✅ Daum Postcode 최소 타입 정의 (any 제거) */
 type DaumPostcodeResult = {
-  zonecode?: string; // 우편번호
-  address?: string; // 기본주소
+  zonecode?: string;
+  address?: string;
 };
 
 type DaumPostcodeOptions = {
@@ -45,13 +45,13 @@ export default function LoginClient({ next }: Props) {
 
   // ✅ address (postcode + address + detail)
   const [postcode, setPostcode] = useState("");
-  const [address, setAddress] = useState(""); // 기본주소
-  const [address2, setAddress2] = useState(""); // 상세주소
+  const [address, setAddress] = useState("");
+  const [address2, setAddress2] = useState("");
 
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [loading, setLoading] = useState(false);
 
-  // ✅ Daum script ready (로드 전 버튼 막기)
+  // ✅ Daum script ready
   const [postcodeReady, setPostcodeReady] = useState(false);
 
   const pwMismatch =
@@ -82,7 +82,6 @@ export default function LoginClient({ next }: Props) {
     }).open();
   };
 
-  // ✅ supabase 가져오는 헬퍼 (null 처리 포함)
   const getSupabase = () => {
     const sb = createSupabaseBrowserClient();
     if (!sb) {
@@ -139,7 +138,6 @@ export default function LoginClient({ next }: Props) {
   const signUpPassword = async () => {
     setLoading(true);
     if (!supabase) return;
-    setLoading(true);
 
     try {
       if (!fullName || !phone || !address || !postcode) {
@@ -147,12 +145,10 @@ export default function LoginClient({ next }: Props) {
         return;
       }
 
-      // 비밀번호 확인 미스매치 방어
       if (!passwordConfirm || password !== passwordConfirm) {
         return;
       }
 
-      // 1) 회원가입
       const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -163,7 +159,6 @@ export default function LoginClient({ next }: Props) {
         return;
       }
 
-      // 2) 세션 안정화
       const { data: sessionData } = await supabase.auth.getSession();
       if (!sessionData.session) {
         const { error: signInErr } = await supabase.auth.signInWithPassword({
@@ -176,7 +171,6 @@ export default function LoginClient({ next }: Props) {
         }
       }
 
-      // 3) 유저 정보 확실히 가져오기
       const { data: userData, error: userErr } = await supabase.auth.getUser();
       if (userErr || !userData.user) {
         alert(`유저 정보를 가져오지 못했어요: ${userErr?.message ?? ""}`);
@@ -185,7 +179,6 @@ export default function LoginClient({ next }: Props) {
 
       const userId = userData.user.id;
 
-      // 4) profiles upsert
       const { error: profileError } = await supabase.from("profiles").upsert({
         id: userId,
         email,
@@ -219,7 +212,6 @@ export default function LoginClient({ next }: Props) {
 
   return (
     <>
-      {/* ✅ 다음 우편번호 스크립트 로드 */}
       <Script
         src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
         strategy="afterInteractive"
@@ -227,8 +219,11 @@ export default function LoginClient({ next }: Props) {
       />
 
       <div style={wrap}>
-        <div style={card}>
-          <h2 style={title}>{mode === "signin" ? "Sign in" : "Sign up"}</h2>
+        {/* ✅ 카드 박스 제거: 컨테이너만 */}
+        <div style={container}>
+          <div style={header}>
+            <h2 style={title}>{mode === "signin" ? "Sign in" : "Sign up"}</h2>
+          </div>
 
           <form onSubmit={onSubmit} style={form}>
             <input
@@ -253,18 +248,18 @@ export default function LoginClient({ next }: Props) {
 
             {mode === "signup" && (
               <>
-                <div style={{ display: "grid", gap: 8 }}>
+                <div style={{ display: "grid", gap: 10 }}>
                   <input
                     value={passwordConfirm}
                     onChange={(e) => setPasswordConfirm(e.target.value)}
-                    placeholder="Confirm Password (비밀번호 확인)"
+                    placeholder="Confirm Password"
                     type="password"
                     autoComplete="new-password"
                     style={{
                       ...input,
-                      border: pwMismatch
-                        ? "1px solid rgba(220, 38, 38, 0.5)"
-                        : input.border,
+                      borderBottom: pwMismatch
+                        ? "1px solid rgba(220, 38, 38, 0.6)"
+                        : input.borderBottom,
                     }}
                   />
                   {pwMismatch && <p style={errorText}>비밀번호가 다릅니다.</p>}
@@ -273,7 +268,7 @@ export default function LoginClient({ next }: Props) {
                 <input
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Name (이름)"
+                  placeholder="Name"
                   type="text"
                   autoComplete="name"
                   style={input}
@@ -282,7 +277,7 @@ export default function LoginClient({ next }: Props) {
                 <input
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Phone number (연락처)"
+                  placeholder="Phone number"
                   type="tel"
                   autoComplete="tel"
                   style={input}
@@ -293,7 +288,7 @@ export default function LoginClient({ next }: Props) {
                     <input
                       value={postcode}
                       readOnly
-                      placeholder="Postcode (우편번호)"
+                      placeholder="Postcode"
                       style={{ ...input, margin: 0 }}
                     />
                     <button
@@ -314,7 +309,7 @@ export default function LoginClient({ next }: Props) {
                   <input
                     value={address}
                     readOnly
-                    placeholder="Address (기본주소)"
+                    placeholder="Address"
                     style={input}
                   />
 
@@ -322,7 +317,7 @@ export default function LoginClient({ next }: Props) {
                     id="address2"
                     value={address2}
                     onChange={(e) => setAddress2(e.target.value)}
-                    placeholder="Detail (상세주소)"
+                    placeholder="Detail"
                     type="text"
                     autoComplete="address-line2"
                     style={input}
@@ -338,8 +333,10 @@ export default function LoginClient({ next }: Props) {
                 opacity:
                   loading ||
                   (mode === "signup" && (pwMismatch || !passwordConfirm))
-                    ? 0.6
+                    ? 0.5
                     : 1,
+                backgroundColor: "#181818",
+                color: "#fff",
               }}
               disabled={
                 loading ||
@@ -350,7 +347,7 @@ export default function LoginClient({ next }: Props) {
                 ? "처리 중..."
                 : mode === "signin"
                   ? "이메일로 로그인"
-                  : "이메일로 회원가입"}
+                  : "Create account"}
             </button>
 
             <button
@@ -368,11 +365,11 @@ export default function LoginClient({ next }: Props) {
 
           <div style={divider}>
             <span style={dividerLine} />
-            <span style={dividerText}>간편 로그인</span>
+            <span style={dividerText}>OR</span>
             <span style={dividerLine} />
           </div>
 
-          <div style={{ display: "grid", gap: 14 }}>
+          <div style={{ display: "grid", gap: 12 }}>
             <button
               onClick={() => signInOAuth("google")}
               style={googleBtn}
@@ -397,9 +394,7 @@ export default function LoginClient({ next }: Props) {
               가입 후 가입한 메일함에서 인증 링크를 눌러주세요.
             </p>
           ) : (
-            <p style={hint}>
-              메일 인증이 켜져 있으면, 가입 후 인증을 완료해야 로그인돼.
-            </p>
+            <p style={hint}></p>
           )}
         </div>
       </div>
@@ -407,31 +402,37 @@ export default function LoginClient({ next }: Props) {
   );
 }
 
-/* styles */
+/* ✅ UI 톤: 카드 제거 + 흘린 느낌(공기/여백/얇은 라인) */
 const wrap: React.CSSProperties = {
   minHeight: "100dvh",
   display: "grid",
   placeItems: "center",
   padding: 24,
-  background: "#fafafa",
+  background: "#f7f6f4", // 살짝 웜한 오프화이트
 };
 
-const card: React.CSSProperties = {
+const container: React.CSSProperties = {
   width: "100%",
-  maxWidth: 420,
-  padding: "40px 32px",
-  borderRadius: 24,
-  border: "1px solid #f1f1f1",
-  boxShadow: "0 8px 30px rgba(0,0,0,0.04)",
-  background: "white",
+  maxWidth: 520,
+  padding: "28px 6px",
+};
+
+const header: React.CSSProperties = {
+  marginBottom: 18,
 };
 
 const title: React.CSSProperties = {
-  textAlign: "center",
-  fontSize: 20,
+  fontSize: 18,
   fontWeight: 500,
-  marginBottom: 28,
-  letterSpacing: -0.3,
+  letterSpacing: -0.2,
+  margin: 0,
+};
+
+const sub: React.CSSProperties = {
+  margin: "8px 0 0",
+  fontSize: 12,
+  opacity: 0.6,
+  lineHeight: 1.5,
 };
 
 const form: React.CSSProperties = {
@@ -442,30 +443,32 @@ const form: React.CSSProperties = {
 
 const input: React.CSSProperties = {
   width: "100%",
-  padding: "14px 16px",
-  borderRadius: 14,
-  border: "1px solid #eaeaea",
+  padding: "12px 2px",
+  borderRadius: 0,
+  border: "none",
+  borderBottom: "1px solid rgba(0,0,0,0.12)",
+  background: "transparent",
   outline: "none",
   fontSize: 14,
 };
 
 const primaryBtn: React.CSSProperties = {
-  padding: "14px 18px",
-  borderRadius: 16,
-  border: "none",
-  fontSize: 14,
-  fontWeight: 700,
+  marginTop: 10,
+  padding: "14px 14px",
+  borderRadius: 12,
+  border: "1px solid rgba(0,0,0,0.14)",
+  fontSize: 13,
+  fontWeight: 600,
   cursor: "pointer",
-  background: "#111",
-  color: "#fff",
+  background: "transparent",
 };
 
 const textBtn: React.CSSProperties = {
   background: "transparent",
   border: "none",
   cursor: "pointer",
-  fontSize: 13,
-  opacity: 0.7,
+  fontSize: 12,
+  opacity: 0.65,
   padding: 6,
 };
 
@@ -473,54 +476,52 @@ const divider: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   gap: 12,
-  marginBottom: 28,
+  margin: "22px 0",
 };
 
 const dividerLine: React.CSSProperties = {
   flex: 1,
   height: 1,
-  background: "#eee",
+  background: "rgba(0,0,0,0.08)",
 };
 
 const dividerText: React.CSSProperties = {
-  fontSize: 12,
+  fontSize: 11,
   opacity: 0.5,
-  letterSpacing: 1,
+  letterSpacing: 1.2,
 };
 
 const baseBtn: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  gap: 12,
-  padding: "14px 18px",
-  borderRadius: 16,
-  fontSize: 14,
-  fontWeight: 700,
+  gap: 10,
+  padding: "14px 16px",
+  borderRadius: 12,
+  fontSize: 13,
+  fontWeight: 600,
   cursor: "pointer",
-  transition: "all 0.2s ease",
+  border: "1px solid rgba(0,0,0,0.12)",
+  background: "transparent",
 };
 
 const googleBtn: React.CSSProperties = {
   ...baseBtn,
-  background: "#ffffff",
-  border: "1px solid #dadce0",
-  color: "#3c4043",
+  color: "#111",
 };
 
 const kakaoBtn: React.CSSProperties = {
   ...baseBtn,
-  background: "#FEE500",
+  color: "#111",
+  backgroundColor: "#fee500",
   border: "none",
-  color: "#181818",
 };
 
 const hint: React.CSSProperties = {
   marginTop: 18,
   fontSize: 12,
   opacity: 0.6,
-  textAlign: "center",
-  lineHeight: 1.5,
+  lineHeight: 1.6,
 };
 
 const errorText: React.CSSProperties = {
@@ -535,8 +536,9 @@ const addrBox: React.CSSProperties = {
   gap: 10,
   padding: 12,
   borderRadius: 16,
-  border: "1px solid #f1f1f1",
-  background: "#fff",
+  border: "1px solid rgba(0,0,0,0.08)",
+  background: "rgba(255,255,255,0.35)",
+  backdropFilter: "blur(6px)",
 };
 
 const addrRow: React.CSSProperties = {
@@ -547,12 +549,12 @@ const addrRow: React.CSSProperties = {
 };
 
 const addrBtn: React.CSSProperties = {
-  padding: "12px 14px",
-  borderRadius: 14,
-  border: "1px solid #eaeaea",
-  background: "#fff",
-  fontSize: 13,
-  fontWeight: 700,
+  padding: "10px 12px",
+  borderRadius: 12,
+  border: "1px solid rgba(0,0,0,0.14)",
+  background: "transparent",
+  fontSize: 12,
+  fontWeight: 600,
   cursor: "pointer",
   whiteSpace: "nowrap",
 };
